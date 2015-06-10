@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
-        android:accountType="emht"
-        android:icon="@drawable/icon"
-        android:smallIcon="@drawable/miniIcon"
-        android:label="@string/label"
-        android:accountPreferences="@xml/account_preferences"
-        />
-
-</PreferenceScreen>
-
+<account-authenticator
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="sintef.android.emht_app"
+    android:icon="@mipmap/ic_launcher"
+    android:smallIcon="@mipmap/ic_launcher"
+    android:label="@string/account_label"
+    android:accountPreferences="@xml/account_preferences"
+    />
