@@ -78,7 +78,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
                 } catch (Exception e) {
                     Log.w(TAG, e.getMessage());
-                    data.putString(KEY_ERROR_MESSAGE, e.getMessage() + "");
+                    data.putString(KEY_ERROR_MESSAGE, e.getClass().getName());
                 }
                 final Intent result = new Intent();
                 result.putExtras(data);

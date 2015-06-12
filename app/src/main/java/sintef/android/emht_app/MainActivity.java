@@ -8,22 +8,28 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
+import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
-public class MainActivity extends Activity {
+
+public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private String ACCOUNT_TYPE = "sintef.android.emht_app";
     private AccountManager mAccountManager;
     private AlertDialog mAlertDialog;
+    private GoogleApiClient mGoogleApiClient;
+    LocationRequest mLocationRequest;
 
 
     @Override
@@ -32,6 +38,10 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mAccountManager = AccountManager.get(this);
         Log.w(TAG, "onCreate");
+
+
+        /* setup location service */
+        buildGoogleApiClient();
 
         /* check if there exists account(s) */
         switch (mAccountManager.getAccountsByType(ACCOUNT_TYPE).length) {
@@ -78,6 +88,14 @@ public class MainActivity extends Activity {
                 }
             }
         }, null);
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
     private void showAccountPicker(final String authTokenType) {
@@ -139,4 +157,29 @@ public class MainActivity extends Activity {
         });
     }
 
+    @Override
+    public void onConnected(Bundle bundle) {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(30000);
+        mLocationRequest.setFastestInterval(10000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.w(TAG, "current location: " + location.getLatitude() + ", " + location.getLongitude());
+        /* sync location with server somehow */
+    }
 }

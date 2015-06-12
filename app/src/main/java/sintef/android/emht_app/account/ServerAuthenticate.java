@@ -10,6 +10,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import sintef.android.emht_app.R;
+
 /**
  * Created by iver on 10/06/15.
  */
@@ -29,7 +31,7 @@ public class ServerAuthenticate {
         String parameters = "username=" + username + "&password=" + password;
 
         try {
-            URL url = new URL(login_url);
+            URL url = new URL(mContext.getString(R.string.login_url_dev));
             connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
