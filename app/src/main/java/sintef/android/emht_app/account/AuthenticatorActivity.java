@@ -67,7 +67,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 String authToken = null;
 
                 try {
-
+                    Log.w(TAG, "trying to get authtoken");
                     authToken = AccountGeneral.getInstance(getApplicationContext()).mServerAuthenticate.userSignIn(userName, userPass, null);
                     Log.w(TAG, authToken);
 
@@ -77,6 +77,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                     data.putString(PARAM_USER_PASS, userPass);
 
                 } catch (Exception e) {
+                    if (e == null) Log.w(TAG, "exception is null");
                     Log.w(TAG, e.getMessage());
                     data.putString(KEY_ERROR_MESSAGE, e.getClass().getName());
                 }

@@ -22,6 +22,6 @@
     <string name="login_url_dev">http://10.218.86.177:9000/login</string>
 
     <!-- incident fragment -->
-    <string name="incident_header">Incident Reception</string>
+    <string name="assignedAlarmsHeader">Alarms assigned to me</string>
 
 </resources>

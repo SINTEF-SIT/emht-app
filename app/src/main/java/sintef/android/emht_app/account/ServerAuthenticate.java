@@ -25,13 +25,13 @@ public class ServerAuthenticate {
     }
 
     public String userSignIn(String username, String password, String authTokenType) {
-        String login_url = "http://10.218.86.177:9000/login";
 
         HttpURLConnection connection;
         String parameters = "username=" + username + "&password=" + password;
 
         try {
-            URL url = new URL(mContext.getString(R.string.login_url_dev));
+            //new URL("http://10.218.86.177:9000/logout").openConnection().connect();
+            URL url = new URL("http://10.218.86.177:9000/login");
             connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -39,6 +39,15 @@ public class ServerAuthenticate {
             new DataOutputStream(connection.getOutputStream()).writeBytes(parameters);
 
             Map<String, List<String>> headerFields = connection.getHeaderFields();
+            Log.w(TAG, "looking for cookie");
+
+            for (List<String> val : headerFields.values()) {
+                for (String str : val) {
+                    Log.w(TAG, str);
+                }
+            }
+
+            Log.w(TAG, "cookie: " + headerFields.get("Set-Cookie"));
             List<String> cookiesHeader = headerFields.get("PLAY_SESSION");
 
             if(cookiesHeader != null)
@@ -48,6 +57,7 @@ public class ServerAuthenticate {
             }
 
         } catch (IOException e) {
+            Log.w(TAG, e.toString());
             e.printStackTrace();
         }
 

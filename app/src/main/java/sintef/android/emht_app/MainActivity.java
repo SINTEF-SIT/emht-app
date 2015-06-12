@@ -29,7 +29,8 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
     private AccountManager mAccountManager;
     private AlertDialog mAlertDialog;
     private GoogleApiClient mGoogleApiClient;
-    LocationRequest mLocationRequest;
+    private LocationRequest mLocationRequest;
+    private String authToken;
 
 
     @Override
@@ -37,6 +38,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAccountManager = AccountManager.get(this);
+
         Log.w(TAG, "onCreate");
 
 
@@ -56,6 +58,9 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 showAccountPicker("dummytoken");
                 break;
         }
+
+        //new ServerPoller(authToken);
+
     }
 
     @Override
@@ -134,8 +139,8 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 try {
                     Bundle bnd = future.getResult();
 
-                    final String authtoken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-                    showMessage((authtoken != null) ? "SUCCESS!\ntoken: " + authtoken : "FAIL");
+                    authToken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
+                    showMessage((authToken != null) ? "SUCCESS!\ntoken: " + authToken : "FAIL");
                     Log.d("udinic", "GetToken Bundle is " + bnd);
                 } catch (Exception e) {
                     e.printStackTrace();

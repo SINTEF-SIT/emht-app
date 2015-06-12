@@ -6,7 +6,14 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/incident_header"
-        android:id="@+id/textView" />
+        android:text="@string/assignedAlarmsHeader"
+        android:id="@+id/assignedAlarmsHeader" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:id="@+id/assignedAlarms"
+        />
 </LinearLayout>
