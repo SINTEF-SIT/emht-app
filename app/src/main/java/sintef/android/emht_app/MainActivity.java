@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +21,17 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import org.json.JSONObject;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -44,6 +56,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
         /* setup location service */
         buildGoogleApiClient();
+        mGoogleApiClient.connect();
 
         /* check if there exists account(s) */
         switch (mAccountManager.getAccountsByType(ACCOUNT_TYPE).length) {
@@ -59,7 +72,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 break;
         }
 
-        //new ServerPoller(authToken);
+
 
     }
 
@@ -96,6 +109,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
     }
 
     protected synchronized void buildGoogleApiClient() {
+        Log.w(TAG, "building googleapiclient");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -160,10 +174,13 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
             }
         });
+
+        new ServerPoller(authToken);
     }
 
     @Override
     public void onConnected(Bundle bundle) {
+        Log.w(TAG, "location connected");
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(30000);
         mLocationRequest.setFastestInterval(10000);
@@ -184,7 +201,42 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
     @Override
     public void onLocationChanged(Location location) {
+
+        Log.w(TAG, "location changed");
+
+        final Map<String, Double> myLocation = new HashMap<String, Double>();
+
+        myLocation.put("latitude", location.getLatitude());
+        myLocation.put("longitude", location.getLongitude());
+
+        new AsyncTask<Void, Void, Void>(
+
+        ) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    URL url = new URL("http://10.218.86.177:9000/location/report");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setDoOutput(true);
+                    connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Cookie", authToken);
+                    new DataOutputStream(connection.getOutputStream()).writeBytes(new JSONObject(myLocation).toString());
+                    connection.connect();
+                    Log.w(TAG, Integer.toString(connection.getResponseCode()));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (ProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        }.execute();
+
         Log.w(TAG, "current location: " + location.getLatitude() + ", " + location.getLongitude());
-        /* sync location with server somehow */
+        Log.w(TAG, new JSONObject(myLocation).toString());
     }
 }

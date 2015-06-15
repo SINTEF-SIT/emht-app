@@ -23,5 +23,7 @@
 
     <!-- incident fragment -->
     <string name="assignedAlarmsHeader">Alarms assigned to me</string>
+    <string name="assignedAlarmsHeader2">foobar</string>
+
 
 </resources>
