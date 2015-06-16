@@ -21,9 +21,16 @@
     <string name="error_field_required">This field is required</string>
     <string name="login_url_dev">http://10.218.86.177:9000/login</string>
 
+    <!-- tabs fragment -->
+    <string name="tabRegistration">Registration</string>
+
     <!-- incident fragment -->
     <string name="assignedAlarmsHeader">Alarms assigned to me</string>
-    <string name="assignedAlarmsHeader2">foobar</string>
+    <string name="assignedAlarmsHeader2">Next header</string>
 
+
+    <!-- registration fragment -->
+    <string name="callee">Callee</string>
+    <string name="patientInformation">Patient information</string>
 
 </resources>

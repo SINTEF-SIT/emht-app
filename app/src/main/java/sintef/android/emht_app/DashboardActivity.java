@@ -7,6 +7,8 @@ import android.util.Log;
 
 import sintef.android.emht_app.fragments.AssessmentFragment;
 import sintef.android.emht_app.fragments.IncidentFragment;
+import sintef.android.emht_app.fragments.RegistrationFragment;
+import sintef.android.emht_app.fragments.TabsFragment;
 import sintef.android.emht_app.models.Alarm;
 
 /**
@@ -17,6 +19,7 @@ public class DashboardActivity extends FragmentActivity {
     private final String TAG = this.getClass().getSimpleName();
     private IncidentFragment incidentFragment;
     private AssessmentFragment assessmentFragment;
+    private RegistrationFragment registrationFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,7 +36,7 @@ public class DashboardActivity extends FragmentActivity {
             if (savedInstanceState != null) {
                 return;
             }
-
+            /*
             // Create a new Fragment to be placed in the activity layout
             incidentFragment = new IncidentFragment();
 
@@ -44,15 +47,20 @@ public class DashboardActivity extends FragmentActivity {
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, incidentFragment).commit();
+                    */
+
+            TabsFragment lol = new TabsFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, lol).commit();
         }
     }
 
-    public void openAlarm(Alarm alarm) {
-        Log.w(TAG, "opening alarm: " + alarm.getId());
+    public void openAlarm(long alarmId) {
+        Log.w(TAG, "opening alarm: " + alarmId);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        assessmentFragment = new AssessmentFragment();
-        assessmentFragment.setArguments(getIntent().getExtras());
-        fragmentTransaction.replace(R.id.fragment_container, assessmentFragment);
+        //assessmentFragment = new AssessmentFragment();
+        //assessmentFragment.setArguments(getIntent().getExtras());
+        registrationFragment = RegistrationFragment.newInstance(alarmId);
+        fragmentTransaction.replace(R.id.fragment_container, registrationFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }

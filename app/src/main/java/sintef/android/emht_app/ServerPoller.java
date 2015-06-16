@@ -4,6 +4,7 @@ import android.accounts.AccountManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,7 +17,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.greenrobot.event.EventBus;
+import sintef.android.emht_app.events.NewAlarmEvent;
 import sintef.android.emht_app.models.Alarm;
+import sintef.android.emht_app.models.Callee;
+import sintef.android.emht_app.models.Patient;
 
 /**
  * Created by iver on 12/06/15.
@@ -27,6 +31,7 @@ public class ServerPoller {
     private EventBus mEventBus;
     private AccountManager mAccountManager;
     private String authToken;
+    private ObjectMapper objectMapper;
 
     public ServerPoller(String authToken) {
         Log.w(TAG, "starting polling");
@@ -38,6 +43,7 @@ public class ServerPoller {
                 poll();
             }
         }, 5000, 30000); // poll every 30 seconds
+        objectMapper = new ObjectMapper();
     }
 
     private void poll() {
@@ -58,23 +64,47 @@ public class ServerPoller {
 
                     for (int i = 0; i < alarms.length(); i++) {
                         JSONObject alarm = alarms.getJSONObject(i);
-                        /* TODO: check if alarms exist */
 
-                        mEventBus.post(new Alarm(
-                                alarm.getLong("id"),
-                                alarm.getString("type"),
-                                null, // callee
-                                null,
-                                null,
-                                null,
-                                alarm.getString("occuranceAddress"),
-                                false, //alarm.getBoolean("expired"),
-                                null,
-                                alarm.getString("alarmLog"),
-                                alarm.getString("notes"),
-                                null
-                        ));
-                        Log.w(TAG, alarm.getString("type"));
+                        for (Alarm lol : Alarm.listAll(Alarm.class)) {
+                            Log.w(TAG, "alarm: " + lol.getCallee().getAddress());
+                        }
+                        for (Patient lul : Patient.listAll(Patient.class)) {
+                            Log.w(TAG, "patient: " + lul);
+                        }
+
+                        for (Callee lal : Callee.listAll(Callee.class)) {
+                            Log.w(TAG, "callee: " + lal);
+                        }
+
+                        /* add alarm to db if it does not exist */
+                        if (Alarm.find(Alarm.class, "alarm_id = ?", Long.toString(alarm.getLong("id"))).size() == 0) {
+
+                            Alarm alarmObj = objectMapper.readValue(alarm.toString(), Alarm.class);
+                            alarmObj.getPatient().save();
+                            alarmObj.getCallee().save();
+                            alarmObj.save();
+                            mEventBus.post(new NewAlarmEvent((alarmObj.getId())));
+
+
+                            /*
+                            new Alarm(
+                                    alarm.getLong("id"),
+                                    alarm.getString("type"),
+                                    null, // callee
+                                    null,
+                                    null,
+                                    null,
+                                    alarm.getString("occuranceAddress"),
+                                    false, //alarm.getBoolean("expired"),
+                                    null,
+                                    alarm.getString("alarmLog"),
+                                    alarm.getString("notes"),
+                                    null
+                            ).save();
+                            mEventBus.post(new NewAlarmEvent(alarm.getLong("id")));
+                            */
+                            Log.w(TAG, "added new alarm to db");
+                        }
                     }
 
                 } catch (Exception e) {
@@ -89,8 +119,8 @@ public class ServerPoller {
         Log.w(TAG, "trying to read url");
         BufferedReader bufferedReader = null;
         try {
-            return "{\"userId\":2,\"username\":\"iver\",\"role\":3,\"alarms\":[{\"id\":2,\"occuranceAddress\":null,\"alarmLog\":null,\"notes\":null,\"type\":\"safety_alarm\",\"openingTime\":\"Mon Sep 15 23:02:57 CEST 2014\",\"dispatchingTime\":null,\"closingTime\":null,\"callee\":{\"id\":1,\"name\":\"Berit Nilsen\",\"phoneNumber\":\"91105432\",\"address\":\"Nedre Møllenberg gt. 44\"},\"patient\":{\"id\":6,\"name\":\"Berit Nilsen\",\"persoNumber\":\"05033326826\",\"phoneNumber\":\"91105432\",\"address\":\"Nedre Møllenberg gt. 44\",\"age\":81}}]}";
-            /*
+            //return "{\"userId\":2,\"username\":\"iver\",\"role\":3,\"alarms\":[{\"id\":2,\"occuranceAddress\":null,\"alarmLog\":null,\"notes\":null,\"type\":\"safety_alarm\",\"openingTime\":\"Mon Sep 15 23:02:57 CEST 2014\",\"dispatchingTime\":null,\"closingTime\":null,\"callee\":{\"id\":1,\"name\":\"Berit Nilsen\",\"phoneNumber\":\"91105432\",\"address\":\"Nedre Møllenberg gt. 44\"},\"patient\":{\"id\":6,\"name\":\"Berit Nilsen\",\"persoNumber\":\"05033326826\",\"phoneNumber\":\"91105432\",\"address\":\"Nedre Møllenberg gt. 44\",\"age\":81}}]}";
+
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Cookie", authToken);
@@ -101,7 +131,7 @@ public class ServerPoller {
             String json = bufferedReader.readLine();
             Log.w(TAG, "read this: " + json);
             return json;
-            */
+
         } finally {
             if (bufferedReader != null)
                 bufferedReader.close();

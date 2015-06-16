@@ -43,7 +43,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private String authToken;
-
+    //private Location previousLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
         /* setup location service */
         buildGoogleApiClient();
-        mGoogleApiClient.connect();
+
 
         /* check if there exists account(s) */
         switch (mAccountManager.getAccountsByType(ACCOUNT_TYPE).length) {
@@ -71,8 +71,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 showAccountPicker("dummytoken");
                 break;
         }
-
-
+        mGoogleApiClient.connect();
 
     }
 
@@ -84,6 +83,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         Intent dashboard = new Intent(this, DashboardActivity.class);
         dashboard.putExtra("username", "dummy");
         startActivity(dashboard);
+
     }
 
     @Override
@@ -156,12 +156,14 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                     authToken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
                     showMessage((authToken != null) ? "SUCCESS!\ntoken: " + authToken : "FAIL");
                     Log.d("udinic", "GetToken Bundle is " + bnd);
+                    new ServerPoller(authToken);
                 } catch (Exception e) {
                     e.printStackTrace();
                     showMessage(e.getMessage());
                 }
             }
         }).start();
+
     }
 
     private void showMessage(final String msg) {
@@ -174,8 +176,6 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
             }
         });
-
-        new ServerPoller(authToken);
     }
 
     @Override
@@ -201,7 +201,14 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
     @Override
     public void onLocationChanged(Location location) {
-
+        /*
+        if (previousLocation == null) previousLocation = location;
+        if (Math.floor(location.getLongitude()/1000) ==
+            Math.floor(previousLocation.getLongitude()/1000) &&
+            Math.floor(location.getLatitude() / 1000) ==
+                    Math.floor(previousLocation.getLatitude()/1000)) return;
+        previousLocation = location;
+        */
         Log.w(TAG, "location changed");
 
         final Map<String, Double> myLocation = new HashMap<String, Double>();

@@ -1,23 +1,26 @@
 package sintef.android.emht_app.models;
 
-import android.util.JsonReader;
+import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by iver on 12/06/15.
  */
-public class Alarm {
+public class Alarm extends SugarRecord<Alarm> {
 
-    private Long id;
+    @JsonProperty("id")
+    private Long alarmId;
+
     private String type;
     private Callee callee;
     private Date openingTime;
+    @Ignore
     private Date dispatchingTime; // TODO: implement dispatching
+    @Ignore
     private Date closingTime; // at the moment we are dispatching and closing all alarms
     private String occuranceAddress; // address of where the incident took place
     private boolean expired = false;
@@ -26,8 +29,11 @@ public class Alarm {
     private String notes;
     private Patient patient;
 
-    public Alarm(Long id, String type, Callee callee, Date openingTime, Date dispatchingTime, Date closingTime, String occuranceAddress, boolean expired, AlarmAttendant attendant, String alarmLog, String notes, Patient patient) {
-        this.id = id;
+    /* empty constructor required by sugar */
+    public Alarm() {}
+
+    public Alarm(Long alarmId, String type, Callee callee, Date openingTime, Date dispatchingTime, Date closingTime, String occuranceAddress, boolean expired, AlarmAttendant attendant, String alarmLog, String notes, Patient patient) {
+        this.alarmId = alarmId;
         this.type = type;
         this.callee = callee;
         this.openingTime = openingTime;
@@ -41,12 +47,12 @@ public class Alarm {
         this.patient = patient;
     }
 
-    public Long getId() {
-        return id;
+    public Long getAlarmId() {
+        return alarmId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setAlarmId(Long id) {
+        this.alarmId = id;
     }
 
     public String getType() {

@@ -11,12 +11,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import sintef.android.emht_app.AlarmAdapter;
 import sintef.android.emht_app.DashboardActivity;
 import sintef.android.emht_app.R;
+import sintef.android.emht_app.events.NewAlarmEvent;
 import sintef.android.emht_app.models.Alarm;
 
 /**
@@ -34,6 +36,8 @@ public class IncidentFragment extends Fragment {
         View incidentView = inflater.inflate(R.layout.fragment_incident, container, false);
         final ListView assignedAlarmsListView = (ListView) incidentView.findViewById(R.id.assignedAlarms);
         assignedAlarms = new ArrayList<Alarm>();
+        assignedAlarms.addAll(Alarm.listAll(Alarm.class));
+        for (Alarm alarm : Alarm.listAll(Alarm.class)) Log.w(TAG, "alarm: " + alarm.getType());
         assignedAlarmsAdapter = new AlarmAdapter(getActivity(), R.layout.listitem_alarm, assignedAlarms);
         assignedAlarmsListView.setAdapter(assignedAlarmsAdapter);
 
@@ -41,7 +45,7 @@ public class IncidentFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.w(TAG, "clicked item: " + position);
-                ((DashboardActivity) getActivity()).openAlarm((Alarm) parent.getItemAtPosition(position));
+                ((DashboardActivity) getActivity()).openAlarm(((Alarm) parent.getItemAtPosition(position)).getId());
             }
         });
 
@@ -60,9 +64,9 @@ public class IncidentFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
-    public void onEvent(Alarm alarm) {
+    public void onEvent(NewAlarmEvent newAlarmEvent) {
         Log.w(TAG, "new alarm broadcasted");
-        assignedAlarms.add(alarm);
+        assignedAlarms.add((Alarm) Alarm.findById(Alarm.class, newAlarmEvent.getId()));
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
