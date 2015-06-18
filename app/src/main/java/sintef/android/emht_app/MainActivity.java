@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -34,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MainActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private String ACCOUNT_TYPE = "sintef.android.emht_app";
@@ -80,10 +81,13 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         super.onResume();
         Log.w(TAG, "onResume");
         /* check if user is logged in. proceed to content */
+        /*
         Intent dashboard = new Intent(this, DashboardActivity.class);
         dashboard.putExtra("username", "dummy");
         startActivity(dashboard);
-
+        */
+        Intent alarmactivity = new Intent(this, AlarmActivity.class);
+        startActivity(alarmactivity);
     }
 
     @Override

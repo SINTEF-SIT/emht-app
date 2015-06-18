@@ -1,9 +1,14 @@
 package sintef.android.emht_app;
 
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.support.design.widget.TabLayout;
+import android.view.View;
+import android.widget.RadioButton;
 
 import sintef.android.emht_app.fragments.AssessmentFragment;
 import sintef.android.emht_app.fragments.IncidentFragment;
@@ -20,48 +25,69 @@ public class DashboardActivity extends FragmentActivity {
     private IncidentFragment incidentFragment;
     private AssessmentFragment assessmentFragment;
     private RegistrationFragment registrationFragment;
+    ViewPager viewPager;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
+        setContentView(R.layout.activity_main);
 
-        // Check that the activity is using the layout version with
-        // the fragment_container FrameLayout
-        if (findViewById(R.id.fragment_container) != null) {
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(new DashboardFragmentPagerAdapter(getSupportFragmentManager(),
+                DashboardActivity.this, getIntent().getExtras().getLong("alarm_id")));
 
-            // However, if we're being restored from a previous state,
-            // then we don't need to do anything and should return or else
-            // we could end up with overlapping fragments.
-            if (savedInstanceState != null) {
-                return;
-            }
-            /*
-            // Create a new Fragment to be placed in the activity layout
-            incidentFragment = new IncidentFragment();
-
-            // In case this activity was started with special instructions from an
-            // Intent, pass the Intent's extras to the fragment as arguments
-            incidentFragment.setArguments(getIntent().getExtras());
-
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, incidentFragment).commit();
-                    */
-
-            TabsFragment lol = new TabsFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, lol).commit();
-        }
+        // Give the TabLayout the ViewPager
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
-    public void openAlarm(long alarmId) {
-        Log.w(TAG, "opening alarm: " + alarmId);
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        //assessmentFragment = new AssessmentFragment();
-        //assessmentFragment.setArguments(getIntent().getExtras());
-        registrationFragment = RegistrationFragment.newInstance(alarmId);
-        fragmentTransaction.replace(R.id.fragment_container, registrationFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.radioAssessmentQuestion1Yes:
+                if (checked)
+                    // Pirates are the best
+                    break;
+            case R.id.radioAssessmentQuestion1No:
+                if (checked)
+                    // Ninjas rule
+                    break;
+            case R.id.radioAssessmentQuestion2Yes:
+                if (checked)
+                    // Pirates are the best
+                    break;
+            case R.id.radioAssessmentQuestion2No:
+                if (checked)
+                    // Ninjas rule
+                    break;
+            case R.id.radioAssessmentQuestion3Yes:
+                if (checked)
+                    // Pirates are the best
+                    break;
+            case R.id.radioAssessmentQuestion3No:
+                if (checked)
+                    // Ninjas rule
+                    break;
+            case R.id.radioAssessmentQuestion4Yes:
+                if (checked)
+                    // Pirates are the best
+                    break;
+            case R.id.radioAssessmentQuestion4No:
+                if (checked)
+                    // Ninjas rule
+                    break;
+            case R.id.radioAssessmentQuestion5Yes:
+                if (checked)
+                    // Pirates are the best
+                    break;
+            case R.id.radioAssessmentQuestion5No:
+                if (checked)
+                    // Ninjas rule
+                    break;
+        }
     }
 }

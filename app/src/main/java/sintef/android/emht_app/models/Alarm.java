@@ -25,14 +25,17 @@ public class Alarm extends SugarRecord<Alarm> {
     private String occuranceAddress; // address of where the incident took place
     private boolean expired = false;
     private AlarmAttendant attendant;
+    private AlarmAttendant mobileCareTaker;
     private String alarmLog;
     private String notes;
     private Patient patient;
+    private double latitude;
+    private double longitude;
 
     /* empty constructor required by sugar */
     public Alarm() {}
 
-    public Alarm(Long alarmId, String type, Callee callee, Date openingTime, Date dispatchingTime, Date closingTime, String occuranceAddress, boolean expired, AlarmAttendant attendant, String alarmLog, String notes, Patient patient) {
+    public Alarm(Long alarmId, String type, Callee callee, Date openingTime, Date dispatchingTime, Date closingTime, String occuranceAddress, boolean expired, AlarmAttendant attendant, AlarmAttendant mobileCareTaker, String alarmLog, String notes, Patient patient, double latitude, double longitude) {
         this.alarmId = alarmId;
         this.type = type;
         this.callee = callee;
@@ -42,9 +45,12 @@ public class Alarm extends SugarRecord<Alarm> {
         this.occuranceAddress = occuranceAddress;
         this.expired = expired;
         this.attendant = attendant;
+        this.mobileCareTaker = mobileCareTaker;
         this.alarmLog = alarmLog;
         this.notes = notes;
         this.patient = patient;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public Long getAlarmId() {
@@ -141,5 +147,29 @@ public class Alarm extends SugarRecord<Alarm> {
 
     public void setPatient(Patient patient) {
         this.patient = patient;
+    }
+
+    public AlarmAttendant getMobileCareTaker() {
+        return mobileCareTaker;
+    }
+
+    public void setMobileCareTaker(AlarmAttendant mobileCareTaker) {
+        this.mobileCareTaker = mobileCareTaker;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

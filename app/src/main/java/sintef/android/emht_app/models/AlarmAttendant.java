@@ -13,12 +13,14 @@ public class AlarmAttendant extends SugarRecord<AlarmAttendant> {
     private Long alarmAttendantId;
 
     private String username;
+    private int role;
 
     public AlarmAttendant() {}
 
-    public AlarmAttendant(Long alarmAttendantId, String username) {
+    public AlarmAttendant(Long alarmAttendantId, String username, int role) {
         this.alarmAttendantId = alarmAttendantId;
         this.username = username;
+        this.role = role;
     }
 
     public Long getAlarmAttendantId() {
@@ -35,5 +37,14 @@ public class AlarmAttendant extends SugarRecord<AlarmAttendant> {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
     }
 }

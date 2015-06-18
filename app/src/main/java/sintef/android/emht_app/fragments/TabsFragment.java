@@ -2,6 +2,7 @@ package sintef.android.emht_app.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,8 @@ public class TabsFragment extends Fragment implements TabHost.OnTabChangeListene
 
         mTabHost.setup();
         mTabHost.addTab(newTab(TAB_REGISTRATION, R.string.tabRegistration, R.id.tabRegistration));
+        mTabHost.addTab(newTab(TAB_ASSESSMENT, R.string.tabAssessment, R.id.tabAssessment));
+        mTabHost.addTab(newTab(TAB_ACTIONS, R.string.tabActions, R.id.tabActions));
 
         return mRoot;
     }
@@ -40,7 +43,7 @@ public class TabsFragment extends Fragment implements TabHost.OnTabChangeListene
         Log.w(TAG, "building tab: " + tag);
 
         View indicator = LayoutInflater.from(getActivity()).inflate(
-                R.layout.tabs,
+                R.layout.tab,
                 (ViewGroup) mRoot.findViewById(android.R.id.tabs), false);
         ((TextView) indicator.findViewById(R.id.tabText)).setText(labelId);
 

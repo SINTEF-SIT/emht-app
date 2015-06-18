@@ -38,6 +38,9 @@
                 android:resource="@xml/authenticator" />
         </service>
 
+        <!-- Alarm activity -->
+        <activity android:name=".AlarmActivity"/>
+
         <!-- Dashboard -->
         <activity android:name=".DashboardActivity"/>
 

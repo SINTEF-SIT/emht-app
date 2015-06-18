@@ -56,7 +56,7 @@ public class ServerPoller {
             protected Alarm doInBackground(Void... params) {
                 /* poll server for alarms. publish on eventbus */
                 try {
-                    json = readUrl("http://10.218.86.177:9000/alarms/assignedToMe");
+                    json = readUrl("http://10.218.86.177:9000/alarm/assignedToMe");
                     if (json == null) return null;
                     Log.w(TAG, "got: " + json);
 

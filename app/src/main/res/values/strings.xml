@@ -21,16 +21,47 @@
     <string name="error_field_required">This field is required</string>
     <string name="login_url_dev">http://10.218.86.177:9000/login</string>
 
-    <!-- tabs fragment -->
+    <!-- general fragments -->
+    <string name="emptyFragment">Please select alarm first</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="log">Log</string>
+
+
+    <!-- tab fragment -->
     <string name="tabRegistration">Registration</string>
+    <string name="tabAssessment">Assessment</string>
+    <string name="tabActions">Actions</string>
+    <string name="notes">Notes</string>
 
     <!-- incident fragment -->
     <string name="assignedAlarmsHeader">Alarms assigned to me</string>
     <string name="assignedAlarmsHeader2">Next header</string>
 
-
     <!-- registration fragment -->
     <string name="callee">Callee</string>
     <string name="patientInformation">Patient information</string>
+
+    <!-- assessment fragment -->
+    <string name="nmiLog">NMI Log</string>
+    <string name="nmi">NMI</string>
+    <string name="assessmentQuestion1">Is the patient conscious?</string>
+    <string name="assessmentQuestion2">Is the patient breathing normally?</string>
+    <string name="assessmentQuestion3">Can the patient move?</string>
+    <string name="assessmentQuestion4">Can the patient stand up?</string>
+    <string name="assessmentQuestion5">Can the patient talk?</string>
+    <string name="sensors">Sensors</string>
+    <string name="caution">OBS!</string>
+
+    <!-- actions fragment -->
+    <string name="distressNumber">Distress Number</string>
+    <string name="police">Police</string>
+    <string name="amk">AMK</string>
+    <string name="fireman">Fireman</string>
+    <string name="doctor">Doctor</string>
+    <string name="mobileCaretaker">Mobile Caretaker</string>
+    <string name="alarmCentral">Alarm Central</string>
+    <string name="ambulatory">Ambulatory</string>
+    <string name="contactPerson">Contact Person</string>
 
 </resources>

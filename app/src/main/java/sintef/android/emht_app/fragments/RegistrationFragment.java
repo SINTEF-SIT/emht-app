@@ -24,6 +24,12 @@ public class RegistrationFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (getArguments().getLong(ALARM_ID) == 0L) return inflater.inflate(R.layout.fragment_empty, container, false);
+        alarmId = getArguments().getLong(ALARM_ID);
+        Log.w(TAG, "alarm id: " + alarmId);
+
+        Alarm alarm = Alarm.findById(Alarm.class, alarmId);
+
         View registrationView = inflater.inflate(R.layout.fragment_registration, container, false);
 
         TextView calleeName = (TextView) registrationView.findViewById(R.id.calleeName);
@@ -36,10 +42,6 @@ public class RegistrationFragment extends Fragment{
         TextView patientAge = (TextView) registrationView.findViewById(R.id.patientAge);
         TextView patientIncidentLocation = (TextView) registrationView.findViewById(R.id.patientIncidentLocation);
         TextView patientLog = (TextView) registrationView.findViewById(R.id.patientLog);
-
-
-        alarmId = (long) getArguments().getSerializable(ALARM_ID);
-        Alarm alarm = (Alarm) Alarm.findById(Alarm.class, alarmId);
 
         calleeName.setText(alarm.getCallee().getName());
         calleeAddress.setText(alarm.getCallee().getAddress());

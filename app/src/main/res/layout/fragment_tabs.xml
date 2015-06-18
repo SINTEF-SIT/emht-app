@@ -5,7 +5,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 android:id="@android:id/tabhost"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
-android:background="#EFEFEF">
+android:background="#FFFFFF">
 
 <LinearLayout
     android:orientation="vertical"
@@ -28,12 +28,12 @@ android:background="#EFEFEF">
             android:layout_height="fill_parent" />
 
         <FrameLayout
-            android:id="@+id/tab_2"
+            android:id="@+id/tabAssessment"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
 
         <FrameLayout
-            android:id="@+id/tab_3"
+            android:id="@+id/tabActions"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
 
