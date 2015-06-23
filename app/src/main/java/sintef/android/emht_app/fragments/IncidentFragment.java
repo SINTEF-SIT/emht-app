@@ -14,9 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import sintef.android.emht_app.AlarmActivity;
+import sintef.android.emht_app.IncidentActivity;
 import sintef.android.emht_app.AlarmAdapter;
-import sintef.android.emht_app.DashboardActivity;
 import sintef.android.emht_app.R;
 import sintef.android.emht_app.events.NewAlarmEvent;
 import sintef.android.emht_app.models.Alarm;
@@ -45,7 +44,7 @@ public class IncidentFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.w(TAG, "clicked item: " + position);
-                ((AlarmActivity) getActivity()).selectAlarm(((Alarm) parent.getItemAtPosition(position)).getId());
+                ((IncidentActivity) getActivity()).selectAlarm(((Alarm) parent.getItemAtPosition(position)).getId());
             }
         });
 

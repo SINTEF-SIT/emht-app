@@ -1,11 +1,14 @@
 package sintef.android.emht_app.fragments;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import sintef.android.emht_app.R;
 import sintef.android.emht_app.models.Alarm;
@@ -29,9 +32,23 @@ public class ActionsFragment extends Fragment {
         Alarm alarm = Alarm.findById(Alarm.class, alarmId);
         View actionsView = inflater.inflate(R.layout.fragment_actions, container, false);
 
+        setupButtons();
+
+        Button callPolice = (Button) actionsView.findViewById(R.id.callPolice);
+        callPolice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:91331021"));
+                startActivity(callIntent);
+            }
+        });
+
         return actionsView;
     }
 
+    private void setupButtons() {
 
+    }
 
 }

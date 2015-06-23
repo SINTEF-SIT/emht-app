@@ -26,17 +26,20 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="log">Log</string>
+    <string name="notes">Notes</string>
+    <string name="completeIncident">Send to central</string>
+    <string name="dismissIncident">Dismiss</string>
+    <string name="notesHint">Enter notes here...</string>
 
 
     <!-- tab fragment -->
     <string name="tabRegistration">Registration</string>
     <string name="tabAssessment">Assessment</string>
     <string name="tabActions">Actions</string>
-    <string name="notes">Notes</string>
 
     <!-- incident fragment -->
     <string name="assignedAlarmsHeader">Alarms assigned to me</string>
-    <string name="assignedAlarmsHeader2">Next header</string>
+    <string name="assignedAlarmsHeader2">Placeholder</string>
 
     <!-- registration fragment -->
     <string name="callee">Callee</string>
@@ -63,5 +66,8 @@
     <string name="alarmCentral">Alarm Central</string>
     <string name="ambulatory">Ambulatory</string>
     <string name="contactPerson">Contact Person</string>
+    <string name="callPolice">Call Police</string>
+    <string name="callAMK">Call AMK</string>
+    <string name="callFireDepartment">Call Fire Department</string>
 
 </resources>

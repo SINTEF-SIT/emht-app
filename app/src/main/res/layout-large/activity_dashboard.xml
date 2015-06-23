@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.sothree.slidinguppanel.SlidingUpPanelLayout
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sliding_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    sothree:umanoPanelHeight="24dp"
+    sothree:umanoShadowHeight="4dp">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/registration_fragment"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            tools:ignore="Suspicious0dp"
+            android:padding="10dp"/>
+
+        <FrameLayout
+            android:id="@+id/assessment_fragment"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            tools:ignore="Suspicious0dp"
+            android:padding="10dp"/>
+
+        <FrameLayout
+            android:id="@+id/actions_fragment"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            tools:ignore="Suspicious0dp"
+            android:padding="10dp"/>
+
+
+    </LinearLayout>
+
+    <include layout="@layout/notes"></include>
+
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>

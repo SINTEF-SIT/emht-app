@@ -5,6 +5,7 @@ import com.orm.dsl.Ignore;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**

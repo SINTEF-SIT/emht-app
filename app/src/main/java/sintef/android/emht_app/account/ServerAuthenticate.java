@@ -38,8 +38,8 @@ public class ServerAuthenticate {
         //String parameters = "username=iver&password=password";
 
         try {
-            new URL("http://10.218.86.177:9000/logout").openConnection().connect();
-            URL url = new URL("http://10.218.86.177:9000/login");
+            new URL("http://129.241.105.197:9000/logout").openConnection().connect();
+            URL url = new URL("http://129.241.105.197:9000/login");
             CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
             connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
@@ -52,7 +52,7 @@ public class ServerAuthenticate {
             connection.getHeaderFields();
             Log.w(TAG, "looking for cookie");
             CookieManager cm = (CookieManager) CookieHandler.getDefault();
-            List<HttpCookie> cookies = cm.getCookieStore().get(new URI("http://10.218.86.177:9000/login"));
+            List<HttpCookie> cookies = cm.getCookieStore().get(new URI("http://129.241.105.197:9000/login"));
 
             String session = null;
 

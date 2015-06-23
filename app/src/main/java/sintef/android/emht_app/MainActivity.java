@@ -4,7 +4,6 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,6 +43,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private String authToken;
+    private Intent incidientActivity;
     //private Location previousLocation;
 
     @Override
@@ -73,7 +73,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
                 break;
         }
         mGoogleApiClient.connect();
-
+        incidientActivity = new Intent(this, IncidentActivity.class);
     }
 
     @Override
@@ -86,8 +86,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
         dashboard.putExtra("username", "dummy");
         startActivity(dashboard);
         */
-        Intent alarmactivity = new Intent(this, AlarmActivity.class);
-        startActivity(alarmactivity);
+        startActivity(incidientActivity);
     }
 
     @Override
@@ -226,7 +225,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    URL url = new URL("http://10.218.86.177:9000/location/report");
+                    URL url = new URL("http://129.241.105.197:9000/location/report");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setDoOutput(true);
                     connection.setRequestProperty("Content-Type", "application/json;charset=utf8");

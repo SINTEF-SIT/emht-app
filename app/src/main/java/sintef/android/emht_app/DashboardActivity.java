@@ -1,19 +1,17 @@
 package sintef.android.emht_app;
 
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.support.design.widget.TabLayout;
 import android.view.View;
 import android.widget.RadioButton;
 
+import sintef.android.emht_app.fragments.ActionsFragment;
 import sintef.android.emht_app.fragments.AssessmentFragment;
 import sintef.android.emht_app.fragments.IncidentFragment;
 import sintef.android.emht_app.fragments.RegistrationFragment;
-import sintef.android.emht_app.fragments.TabsFragment;
 import sintef.android.emht_app.models.Alarm;
 
 /**
@@ -30,16 +28,31 @@ public class DashboardActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_dashboard);
 
-        // Get the ViewPager and set it's PagerAdapter so that it can display items
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(new DashboardFragmentPagerAdapter(getSupportFragmentManager(),
-                DashboardActivity.this, getIntent().getExtras().getLong("alarm_id")));
+        if (getResources().getBoolean(R.bool.isTablet)) {
+            RegistrationFragment registrationFragment = new RegistrationFragment();
+            registrationFragment.setArguments(getIntent().getExtras());
+            AssessmentFragment assessmentFragment = new AssessmentFragment();
+            assessmentFragment.setArguments(getIntent().getExtras());
+            ActionsFragment actionsFragment = new ActionsFragment();
+            actionsFragment.setArguments(getIntent().getExtras());
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.registration_fragment, registrationFragment)
+                    .add(R.id.assessment_fragment, assessmentFragment)
+                    .add(R.id.actions_fragment, actionsFragment)
+                    .commit();
+        } else {
+            // Get the ViewPager and set it's PagerAdapter so that it can display items
+            viewPager = (ViewPager) findViewById(R.id.viewpager);
+            viewPager.setAdapter(new DashboardFragmentPagerAdapter(getSupportFragmentManager(),
+                    DashboardActivity.this, getIntent().getExtras().getLong("alarm_id")));
 
-        // Give the TabLayout the ViewPager
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
-        tabLayout.setupWithViewPager(viewPager);
+            // Give the TabLayout the ViewPager
+            TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+            tabLayout.setupWithViewPager(viewPager);
+        }
     }
 
     public void onRadioButtonClicked(View view) {

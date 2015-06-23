@@ -5,12 +5,13 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
+import sintef.android.emht_app.fragments.EmptyFragment;
 import sintef.android.emht_app.fragments.IncidentFragment;
 
 /**
  * Created by iver on 17/06/15.
  */
-public class AlarmActivity extends FragmentActivity {
+public class IncidentActivity extends FragmentActivity {
 
     private final String TAG = this.getClass().getSimpleName();
     private final static String ALARM_ID = "alarm_id";
@@ -18,7 +19,7 @@ public class AlarmActivity extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
+        setContentView(R.layout.activity_incident);
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -38,8 +39,19 @@ public class AlarmActivity extends FragmentActivity {
             incidentFragment.setArguments(getIntent().getExtras());
 
             // Add the fragment to the 'fragment_container' FrameLayout
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, incidentFragment).commit();
+            if (getResources().getBoolean(R.bool.isTablet)) {
+                EmptyFragment emptyFragment = new EmptyFragment();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.incident_fragment, incidentFragment)
+                        .add(R.id.empty_fragment, emptyFragment)
+                        .commit();
+            } else {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, incidentFragment)
+                        .commit();
+            }
+
         }
     }
 
