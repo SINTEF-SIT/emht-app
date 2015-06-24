@@ -30,6 +30,10 @@
     <string name="completeIncident">Send to central</string>
     <string name="dismissIncident">Dismiss</string>
     <string name="notesHint">Enter notes here...</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_dismiss">Are you sure you want to dismiss this alarm?</string>
+    <string name="dialog_approve">Are you sure you want to send the alarm to central?</string>
 
 
     <!-- tab fragment -->
@@ -40,6 +44,7 @@
     <!-- incident fragment -->
     <string name="assignedAlarmsHeader">Alarms assigned to me</string>
     <string name="assignedAlarmsHeader2">Placeholder</string>
+    <string name="popup_maps">Start navigation</string>
 
     <!-- registration fragment -->
     <string name="callee">Callee</string>

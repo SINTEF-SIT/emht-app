@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class DashboardFragmentPagerAdapter extends FragmentPagerAdapter {
 
     private String tabTitles[] = new String[] { "Registration", "Assessment", "Actions" };
-    final int PAGE_COUNT = tabTitles.length;
     private Context context;
     private long alarmId;
 
@@ -29,7 +28,7 @@ public class DashboardFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return PAGE_COUNT;
+        return tabTitles.length;
     }
 
     @Override

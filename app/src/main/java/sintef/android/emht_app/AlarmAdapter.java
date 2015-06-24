@@ -39,11 +39,11 @@ public class AlarmAdapter extends ArrayAdapter<Alarm> {
             TextView description = (TextView) view.findViewById(R.id.assignedAlarmDescription);
 
             if (name != null) {
-                name.setText(alarm.getOccuranceAddress());
+                name.setText(alarm.getPatient().getName());
             }
 
             if (description != null) {
-                description.setText(alarm.getType());
+                description.setText(alarm.getOccuranceAddress());
             }
         }
         return view;

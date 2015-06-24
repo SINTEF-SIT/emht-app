@@ -17,6 +17,7 @@
         android:layout_height="500dp"
         android:hint="@string/notesHint"
         android:inputType="textImeMultiLine"
-        android:gravity="left|top" />
+        android:gravity="left|top"
+        android:id="@+id/notes"/>
 
 </LinearLayout>
