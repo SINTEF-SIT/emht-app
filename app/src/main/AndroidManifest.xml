@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.CALL_PHONE"></uses-permission>
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
 
     <!-- Authenticator -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -38,6 +38,9 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
+
+        <!-- ServerSync -->
+        <service android:name=".account.ServerSync"/>
 
         <!-- Alarm activity -->
         <activity android:name=".IncidentActivity"/>

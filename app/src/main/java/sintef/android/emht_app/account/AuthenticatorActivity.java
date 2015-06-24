@@ -3,6 +3,7 @@ package sintef.android.emht_app.account;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.IOException;
 
 import sintef.android.emht_app.R;
 
@@ -30,6 +33,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private final int REQ_SIGNUP = 1;
 
     private String mAuthTokenType = "dummy access";
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         mAccountManager = AccountManager.get(getBaseContext());
         String accountName = getIntent().getStringExtra(ARG_ACCOUNT_NAME);
         Log.w(TAG, "onCreate");
+        progressDialog = new ProgressDialog(AuthenticatorActivity.this);
 
         findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,12 +64,19 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         final String userName = ((TextView) findViewById(R.id.username)).getText().toString();
         final String userPass = ((TextView) findViewById(R.id.password)).getText().toString();
 
+        progressDialog.setCancelable(false);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setTitle("Logging in...");
+        progressDialog.setMessage("Please wait.");
+        progressDialog.show();
+
         new AsyncTask<String, Void, Intent>() {
 
             @Override
             protected Intent doInBackground(String... params) {
                 Bundle data = new Bundle();
                 String authToken = null;
+
 
                 try {
                     Log.w(TAG, "trying to get authtoken");
@@ -78,8 +90,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
                 } catch (Exception e) {
                     if (e == null) Log.w(TAG, "exception is null");
+                    e.printStackTrace();
                     Log.w(TAG, e.getMessage());
-                    data.putString(KEY_ERROR_MESSAGE, e.getClass().getName());
+                    data.putString(KEY_ERROR_MESSAGE, e.getMessage());
                 }
                 final Intent result = new Intent();
                 result.putExtras(data);
@@ -88,8 +101,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
             @Override
             protected void onPostExecute(Intent intent) {
+                progressDialog.dismiss();
                 if (intent.hasExtra(KEY_ERROR_MESSAGE)) {
-                    Toast.makeText(getBaseContext(), intent.getStringExtra(KEY_ERROR_MESSAGE), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getBaseContext(), intent.getStringExtra(KEY_ERROR_MESSAGE), Toast.LENGTH_SHORT).show();
+                    ((TextView) findViewById(R.id.login_error_field)).setText(intent.getStringExtra(KEY_ERROR_MESSAGE));
                 } else {
                     finishLogin(intent);
                 }

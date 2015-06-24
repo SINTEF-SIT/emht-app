@@ -33,15 +33,15 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import sintef.android.emht_app.account.ServerSync;
 
-public class MainActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+
+public class MainActivity extends FragmentActivity {
 
     private final String TAG = this.getClass().getSimpleName();
     private String ACCOUNT_TYPE = "sintef.android.emht_app";
     private AccountManager mAccountManager;
     private AlertDialog mAlertDialog;
-    private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
     private String authToken;
     private Intent incidientActivity;
     //private Location previousLocation;
@@ -53,11 +53,6 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
         mAccountManager = AccountManager.get(this);
 
         Log.w(TAG, "onCreate");
-
-
-        /* setup location service */
-        buildGoogleApiClient();
-
 
         /* check if there exists account(s) */
         switch (mAccountManager.getAccountsByType(ACCOUNT_TYPE).length) {
@@ -72,7 +67,11 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
                 showAccountPicker("dummytoken");
                 break;
         }
-        mGoogleApiClient.connect();
+        //mGoogleApiClient.connect();
+        Intent serverSync = new Intent(this, ServerSync.class);
+        serverSync.putExtra("account_id", 0);
+        serverSync.putExtra("auth_token_type", "dummytoken");
+        startService(serverSync);
         incidientActivity = new Intent(this, IncidentActivity.class);
     }
 
@@ -80,12 +79,6 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
     protected void onResume() {
         super.onResume();
         Log.w(TAG, "onResume");
-        /* check if user is logged in. proceed to content */
-        /*
-        Intent dashboard = new Intent(this, DashboardActivity.class);
-        dashboard.putExtra("username", "dummy");
-        startActivity(dashboard);
-        */
         startActivity(incidientActivity);
     }
 
@@ -111,14 +104,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
         }, null);
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        Log.w(TAG, "building googleapiclient");
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
+
 
     private void showAccountPicker(final String authTokenType) {
         final Account availableAccounts[] = mAccountManager.getAccountsByType(ACCOUNT_TYPE);
@@ -159,7 +145,6 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
                     authToken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
                     showMessage((authToken != null) ? "SUCCESS!\ntoken: " + authToken : "FAIL");
                     Log.d("udinic", "GetToken Bundle is " + bnd);
-                    new ServerPoller(authToken);
                 } catch (Exception e) {
                     e.printStackTrace();
                     showMessage(e.getMessage());
@@ -179,74 +164,5 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.Co
                 Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.w(TAG, "location connected");
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(30000);
-        mLocationRequest.setFastestInterval(10000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        /*
-        if (previousLocation == null) previousLocation = location;
-        if (Math.floor(location.getLongitude()/1000) ==
-            Math.floor(previousLocation.getLongitude()/1000) &&
-            Math.floor(location.getLatitude() / 1000) ==
-                    Math.floor(previousLocation.getLatitude()/1000)) return;
-        previousLocation = location;
-        */
-        Log.w(TAG, "location changed");
-
-        final Map<String, Double> myLocation = new HashMap<String, Double>();
-
-        myLocation.put("latitude", location.getLatitude());
-        myLocation.put("longitude", location.getLongitude());
-
-        new AsyncTask<Void, Void, Void>(
-
-        ) {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    URL url = new URL("http://129.241.105.197:9000/location/report");
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoOutput(true);
-                    connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("Cookie", authToken);
-                    new DataOutputStream(connection.getOutputStream()).writeBytes(new JSONObject(myLocation).toString());
-                    connection.connect();
-                    Log.w(TAG, Integer.toString(connection.getResponseCode()));
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (ProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-        }.execute();
-
-        Log.w(TAG, "current location: " + location.getLatitude() + ", " + location.getLongitude());
-        Log.w(TAG, new JSONObject(myLocation).toString());
     }
 }

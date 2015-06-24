@@ -40,11 +40,10 @@ public class IncidentActivity extends FragmentActivity {
 
             // Add the fragment to the 'fragment_container' FrameLayout
             if (getResources().getBoolean(R.bool.isTablet)) {
-                EmptyFragment emptyFragment = new EmptyFragment();
                 getSupportFragmentManager()
                         .beginTransaction()
                         .add(R.id.incident_fragment, incidentFragment)
-                        .add(R.id.empty_fragment, emptyFragment)
+                        .add(R.id.empty_fragment, new EmptyFragment())
                         .commit();
             } else {
                 getSupportFragmentManager().beginTransaction()
