@@ -24,6 +24,7 @@ import android.widget.TextView;
 import sintef.android.emht_app.account.ServerSync;
 import sintef.android.emht_app.fragments.ActionsFragment;
 import sintef.android.emht_app.fragments.AssessmentFragment;
+import sintef.android.emht_app.fragments.DrawerFragment;
 import sintef.android.emht_app.fragments.IncidentFragment;
 import sintef.android.emht_app.fragments.RegistrationFragment;
 import sintef.android.emht_app.models.Alarm;
@@ -59,6 +60,7 @@ public class DashboardActivity extends FragmentActivity {
                     .add(R.id.registration_fragment, registrationFragment)
                     .add(R.id.assessment_fragment, assessmentFragment)
                     .add(R.id.actions_fragment, actionsFragment)
+                    .add(R.id.drawer_fragment, new DrawerFragment())
                     .commit();
         } else {
             // Get the ViewPager and set it's PagerAdapter so that it can display items
@@ -70,6 +72,11 @@ public class DashboardActivity extends FragmentActivity {
             // Give the TabLayout the ViewPager
             TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
             tabLayout.setupWithViewPager(viewPager);
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.drawer_fragment, new DrawerFragment())
+                    .commit();
         }
 
         ((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
@@ -233,5 +240,13 @@ public class DashboardActivity extends FragmentActivity {
                     // Ninjas rule
                     break;
         }
+    }
+
+    public void selectAlarm(long alarmId) {
+        Log.w(TAG, "selecting alarm: " + alarmId);
+        Intent dashboard = new Intent(this, DashboardActivity.class);
+        dashboard.putExtra(ALARM_ID, alarmId);
+        finish();
+        startActivity(dashboard);
     }
 }
