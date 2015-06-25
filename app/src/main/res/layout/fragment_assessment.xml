@@ -307,7 +307,7 @@
             android:padding="10dp"
             android:id="@+id/cautionLog"
             android:inputType="textMultiLine"
-            android:text="Har kols.\nEr voldelig.\nHar liten tiss.\nEr dust.\n"/>
+            android:text="Har kols.\nEr voldelig.\n"/>
 
 
     </LinearLayout>

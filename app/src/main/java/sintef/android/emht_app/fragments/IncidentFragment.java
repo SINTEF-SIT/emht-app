@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,7 @@ public class IncidentFragment extends Fragment {
                             case (R.id.alarm_popup_maps):
                                 startActivity(new Intent(
                                         Intent.ACTION_VIEW,
-                                        Uri.parse("http://maps.google.com/maps?daddr="+daddr)
+                                        Uri.parse("http://maps.google.com/maps?daddr=" + daddr)
                                 ));
                         }
                         return true;
@@ -84,6 +85,7 @@ public class IncidentFragment extends Fragment {
             }
         });
 
+        ((TextView) incidentView.findViewById(R.id.usernameTextView)).setText("iver"); // should probably not
         return incidentView;
     }
 

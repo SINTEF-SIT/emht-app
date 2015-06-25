@@ -4,10 +4,12 @@ import com.orm.SugarRecord;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.io.Serializable;
+
 /**
  * Created by iver on 12/06/15.
  */
-public class Patient extends SugarRecord<Patient> {
+public class Patient extends SugarRecord<Patient> implements Serializable {
 
     @JsonProperty("id")
     private Long patientId;

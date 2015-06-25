@@ -8,9 +8,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,6 +20,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -55,6 +59,7 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
     private Timer poller;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
+    IBinder mBinder = new LocalBinder();
 
     @Override
     public void onCreate() {
@@ -62,6 +67,7 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
         Log.w(TAG, "starting polling");
         mEventBus = EventBus.getDefault();
         objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
         mAccountManager = AccountManager.get(getApplicationContext());
         mAccountManager.addOnAccountsUpdatedListener(this, null, false);
         buildGoogleApiClient();
@@ -181,7 +187,13 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
+    }
+
+    public class LocalBinder extends Binder {
+        public ServerSync getService() {
+            return ServerSync.this;
+        }
     }
 
     private void poll() {
@@ -300,5 +312,37 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
                 startSync();
             }
         }
+    }
+
+    public void transmitAlarm(final Alarm alarm) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    getExistingAccountAuthToken(account, authTokenType);
+                    URL url = new URL("http://129.241.105.197:9000/alarm/saveAndFollowup");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setDoOutput(true);
+                    connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Cookie", authToken);
+                    objectMapper.writeValue(new DataOutputStream(connection.getOutputStream()), alarm);
+                    connection.connect();
+                    if (connection.getResponseCode() != 200) {
+                        invalidateAuthToken(account, authTokenType);
+                        return null;
+                    }
+                    Log.w(TAG, Integer.toString(connection.getResponseCode()));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (ProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        }.execute();
     }
 }

@@ -20,6 +20,7 @@
     <string name="error_incorrect_login">This username and/or password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="login_url_dev">http://10.218.86.177:9000/login</string>
+    <string name="login_message">Please login to continue.</string>
 
     <!-- general fragments -->
     <string name="emptyFragment">Please select alarm first</string>
@@ -45,10 +46,19 @@
     <string name="assignedAlarmsHeader">Alarms assigned to me</string>
     <string name="assignedAlarmsHeader2">Placeholder</string>
     <string name="popup_maps">Start navigation</string>
+    <string name="logged_in_as">Logged in as:</string>
 
     <!-- registration fragment -->
     <string name="callee">Callee</string>
     <string name="patientInformation">Patient information</string>
+    <string name="phoneNumber">Phone number:</string>
+    <string name="age">Age:</string>
+    <string name="address">Address:</string>
+    <string name="personalNumber">National identification number:</string>
+    <string name="incidentAddress">Address of incident:</string>
+    <string name="name">Name:</string>
+    <string name="registrationLog">Log:</string>
+
 
     <!-- assessment fragment -->
     <string name="nmiLog">NMI Log</string>

@@ -1,9 +1,11 @@
 package sintef.android.emht_app;
 
+import android.accounts.AccountManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.widget.TextView;
 
 import sintef.android.emht_app.fragments.EmptyFragment;
 import sintef.android.emht_app.fragments.IncidentFragment;

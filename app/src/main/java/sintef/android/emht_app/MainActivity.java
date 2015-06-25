@@ -67,12 +67,9 @@ public class MainActivity extends FragmentActivity {
                 showAccountPicker("dummytoken");
                 break;
         }
-        //mGoogleApiClient.connect();
-        Intent serverSync = new Intent(this, ServerSync.class);
-        serverSync.putExtra("account_id", 0);
-        serverSync.putExtra("auth_token_type", "dummytoken");
-        startService(serverSync);
         incidientActivity = new Intent(this, IncidentActivity.class);
+        incidientActivity.putExtra("account_id", 0);
+        incidientActivity.putExtra("auth_token_type", "dummytoken");
     }
 
     @Override

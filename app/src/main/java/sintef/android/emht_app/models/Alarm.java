@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * Created by iver on 12/06/15.
  */
-public class Alarm extends SugarRecord<Alarm> {
+public class Alarm extends SugarRecord<Alarm> implements Serializable {
 
     @JsonProperty("id")
     private Long alarmId;

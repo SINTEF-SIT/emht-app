@@ -1,17 +1,27 @@
 package sintef.android.emht_app;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.design.widget.TabLayout;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
+import sintef.android.emht_app.account.ServerSync;
 import sintef.android.emht_app.fragments.ActionsFragment;
 import sintef.android.emht_app.fragments.AssessmentFragment;
 import sintef.android.emht_app.fragments.IncidentFragment;
@@ -29,6 +39,8 @@ public class DashboardActivity extends FragmentActivity {
     private RegistrationFragment registrationFragment;
     ViewPager viewPager;
     private final String ALARM_ID = "alarm_id";
+    private ServerSync mServerSync;
+    private boolean mBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +75,46 @@ public class DashboardActivity extends FragmentActivity {
         ((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
                 Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID)).getNotes()
         );
+        Intent serverSync = new Intent(this, ServerSync.class);
+        serverSync.putExtra("account_id", getIntent().getExtras().getInt("account_id"));
+        serverSync.putExtra("auth_token_type", "dummytoken");
+        startService(serverSync);
+    }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            ServerSync.LocalBinder binder = (ServerSync.LocalBinder) service;
+            mServerSync = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Bind to ServerSync
+        Intent intent = new Intent(this, ServerSync.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
     }
 
     @Override
@@ -105,6 +157,7 @@ public class DashboardActivity extends FragmentActivity {
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 updateAlarmBeforeExit();
+                                finish();
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -128,6 +181,9 @@ public class DashboardActivity extends FragmentActivity {
 
         alarm.save();
         // send json to some endpoint...
+
+        if (mBound) mServerSync.transmitAlarm(alarm);
+        else Log.w(TAG, "serversync not bound!");
     }
 
     public void onRadioButtonClicked(View view) {
