@@ -31,9 +31,11 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import sintef.android.emht_app.account.ServerSync;
+import sintef.android.emht_app.models.Alarm;
 
 
 public class MainActivity extends FragmentActivity {
@@ -43,8 +45,9 @@ public class MainActivity extends FragmentActivity {
     private AccountManager mAccountManager;
     private AlertDialog mAlertDialog;
     private String authToken;
-    private Intent incidientActivity;
+    //private Intent incidientActivity;
     //private Location previousLocation;
+    private Intent dashboardActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,16 +70,24 @@ public class MainActivity extends FragmentActivity {
                 showAccountPicker("dummytoken");
                 break;
         }
-        incidientActivity = new Intent(this, IncidentActivity.class);
-        incidientActivity.putExtra("account_id", 0);
-        incidientActivity.putExtra("auth_token_type", "dummytoken");
+        //incidientActivity = new Intent(this, IncidentActivity.class);
+        //incidientActivity.putExtra("account_id", 0);
+        //incidientActivity.putExtra("auth_token_type", "dummytoken");
+        dashboardActivity = new Intent(this, DashboardActivity.class);
+        dashboardActivity.putExtra("account_id", 0);
+        dashboardActivity.putExtra("auth_token_type", "dummytoken");
+
+        /* Retrieve first alarm from database.
+           If no alarms are available (i.e. first login) start the app without an alarm selected  */
+        List<Alarm> firstAlarm = Alarm.findWithQuery(Alarm.class, "select * from alarm order by ROWID asc limit 1");
+        if (firstAlarm.size() > 0) dashboardActivity.putExtra("alarm_id", firstAlarm.get(0).getId());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.w(TAG, "onResume");
-        startActivity(incidientActivity);
+        startActivity(dashboardActivity);
     }
 
     @Override

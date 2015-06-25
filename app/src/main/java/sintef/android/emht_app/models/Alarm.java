@@ -32,6 +32,7 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
     private Patient patient;
     private double latitude;
     private double longitude;
+    private Assessment assessment;
 
     /* empty constructor required by sugar */
     public Alarm() {}
@@ -172,5 +173,14 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+
+    public Assessment getAssessment() {
+        return assessment;
+    }
+
+    public void setAssessment(Assessment assessment) {
+        this.assessment = assessment;
     }
 }

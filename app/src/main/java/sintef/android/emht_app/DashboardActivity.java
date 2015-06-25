@@ -79,9 +79,9 @@ public class DashboardActivity extends FragmentActivity {
                     .commit();
         }
 
-        ((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
-                Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID)).getNotes()
-        );
+        //((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
+        //        Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID)).getNotes()
+        //);
         Intent serverSync = new Intent(this, ServerSync.class);
         serverSync.putExtra("account_id", getIntent().getExtras().getInt("account_id"));
         serverSync.putExtra("auth_token_type", "dummytoken");
