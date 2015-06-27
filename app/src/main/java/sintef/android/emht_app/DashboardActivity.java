@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -21,6 +22,9 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import sintef.android.emht_app.account.BoundServiceListener;
 import sintef.android.emht_app.account.ServerSync;
 import sintef.android.emht_app.fragments.ActionsFragment;
 import sintef.android.emht_app.fragments.AssessmentFragment;
@@ -42,6 +46,7 @@ public class DashboardActivity extends FragmentActivity {
     private final String ALARM_ID = "alarm_id";
     private ServerSync mServerSync;
     private boolean mBound = false;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +84,7 @@ public class DashboardActivity extends FragmentActivity {
                     .commit();
         }
 
+
         //((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
         //        Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID)).getNotes()
         //);
@@ -98,6 +104,14 @@ public class DashboardActivity extends FragmentActivity {
             ServerSync.LocalBinder binder = (ServerSync.LocalBinder) service;
             mServerSync = binder.getService();
             mBound = true;
+
+            binder.setListener(new BoundServiceListener() {
+                @Override
+                public void showErrorDialog(int errorCode) {
+                    if (GooglePlayServicesUtil.isUserRecoverableError(errorCode))
+                        GooglePlayServicesUtil.getErrorDialog(errorCode, getParent(), 9000).show();
+                }
+            });
         }
 
         @Override
@@ -177,6 +191,8 @@ public class DashboardActivity extends FragmentActivity {
             }
         }.show(getSupportFragmentManager(), "CompleteDialogFragment");
     }
+
+
 
     private void updateAlarmBeforeExit() {
         // gather entered data and send to server

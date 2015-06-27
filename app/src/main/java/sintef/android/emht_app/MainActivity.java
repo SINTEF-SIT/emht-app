@@ -4,11 +4,10 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
@@ -17,24 +16,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import org.json.JSONObject;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import sintef.android.emht_app.account.ServerSync;
 import sintef.android.emht_app.models.Alarm;
 
 
@@ -56,6 +41,11 @@ public class MainActivity extends FragmentActivity {
         mAccountManager = AccountManager.get(this);
 
         Log.w(TAG, "onCreate");
+
+        /* check if google play services is installed
+           TODO: force user to install
+         */
+        checkGooglePlayServices(this);
 
         /* check if there exists account(s) */
         switch (mAccountManager.getAccountsByType(ACCOUNT_TYPE).length) {
@@ -81,6 +71,22 @@ public class MainActivity extends FragmentActivity {
            If no alarms are available (i.e. first login) start the app without an alarm selected  */
         List<Alarm> firstAlarm = Alarm.findWithQuery(Alarm.class, "select * from alarm order by ROWID asc limit 1");
         if (firstAlarm.size() > 0) dashboardActivity.putExtra("alarm_id", firstAlarm.get(0).getId());
+    }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    public static boolean checkGooglePlayServices(Activity activity) {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, activity, 9000).show();
+            }
+            return false;
+        }
+        return true;
     }
 
     @Override

@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -40,6 +41,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.greenrobot.event.EventBus;
+import sintef.android.emht_app.MainActivity;
 import sintef.android.emht_app.events.NewAlarmEvent;
 import sintef.android.emht_app.models.Alarm;
 
@@ -60,6 +62,8 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     IBinder mBinder = new LocalBinder();
+    private BoundServiceListener mListener;
+    private int googleApiErrorCode = 0;
 
     @Override
     public void onCreate() {
@@ -129,7 +133,8 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        Log.w(TAG, "googleapierrorcode: " + connectionResult.getErrorCode());
+        googleApiErrorCode = connectionResult.getErrorCode();
     }
 
     @Override
@@ -193,6 +198,11 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
     public class LocalBinder extends Binder {
         public ServerSync getService() {
             return ServerSync.this;
+        }
+        public void setListener(BoundServiceListener listener) {
+            mListener = listener;
+            Log.w(TAG, "setListener, error code is: " + googleApiErrorCode);
+            if (googleApiErrorCode > 0) mListener.showErrorDialog(googleApiErrorCode);
         }
     }
 
