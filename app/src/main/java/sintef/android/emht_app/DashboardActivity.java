@@ -2,6 +2,7 @@ package sintef.android.emht_app;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
@@ -108,8 +109,7 @@ public class DashboardActivity extends FragmentActivity {
             binder.setListener(new BoundServiceListener() {
                 @Override
                 public void showErrorDialog(int errorCode) {
-                    if (GooglePlayServicesUtil.isUserRecoverableError(errorCode))
-                        GooglePlayServicesUtil.getErrorDialog(errorCode, getParent(), 9000).show();
+                    buildErrorDialog(errorCode);
                 }
             });
         }
@@ -119,6 +119,17 @@ public class DashboardActivity extends FragmentActivity {
             mBound = false;
         }
     };
+
+    private void buildErrorDialog(int errorCode) {
+        if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
+            GooglePlayServicesUtil.getErrorDialog(errorCode, this, 9000, new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    DashboardActivity.this.finish();
+                }
+            }).show();
+        }
+    }
 
     @Override
     protected void onStart() {
