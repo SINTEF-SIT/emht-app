@@ -21,9 +21,15 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.codehaus.jackson.Version;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.module.SimpleModule;
+import org.codehaus.jackson.map.ser.FilterProvider;
+import org.codehaus.jackson.map.ser.impl.SimpleBeanPropertyFilter;
+import org.codehaus.jackson.map.ser.impl.SimpleFilterProvider;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -44,6 +50,7 @@ import de.greenrobot.event.EventBus;
 import sintef.android.emht_app.MainActivity;
 import sintef.android.emht_app.events.NewAlarmEvent;
 import sintef.android.emht_app.models.Alarm;
+import sintef.android.emht_app.models.AlarmSerializer;
 
 /**
  * Created by iver on 24/06/15.
@@ -202,7 +209,7 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
         public void setListener(BoundServiceListener listener) {
             mListener = listener;
             Log.w(TAG, "setListener, error code is: " + googleApiErrorCode);
-            if (googleApiErrorCode > 0) mListener.showErrorDialog(googleApiErrorCode);
+            if (googleApiErrorCode > 0) mListener.showGooglePlayServicesErrorDialog(googleApiErrorCode);
         }
     }
 
@@ -229,13 +236,17 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
                             Alarm alarmObj = objectMapper.readValue(alarm.toString(), Alarm.class);
                             alarmObj.getPatient().save();
                             alarmObj.getCallee().save();
+                            alarmObj.getAssessment().save();
+                            alarmObj.getAssessment().getNmi().save();
+                            alarmObj.getAttendant().save();
+                            alarmObj.getMobileCareTaker().save();
                             alarmObj.save();
                             mEventBus.post(new NewAlarmEvent((alarmObj.getId())));
                             Log.w(TAG, "added new alarm to db");
                         }
                     }
                 } catch (Exception e) {
-                    Log.w(TAG, e.toString());
+                    e.printStackTrace();
                 }
                 return null;
             }
@@ -324,10 +335,14 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
         }
     }
 
+    public void addAlarmToTransmitQueue(Alarm alarm) {
+        transmitAlarm(alarm);
+    }
+
     public void transmitAlarm(final Alarm alarm) {
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Boolean doInBackground(Void... params) {
                 try {
                     getExistingAccountAuthToken(account, authTokenType);
                     URL url = new URL("http://129.241.105.197:9000/alarm/saveAndFollowup");
@@ -336,13 +351,28 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
                     connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
                     connection.setRequestMethod("POST");
                     connection.setRequestProperty("Cookie", authToken);
-                    objectMapper.writeValue(new DataOutputStream(connection.getOutputStream()), alarm);
+
+                    /* Sugar ORM null Date object hack */
+                    //SimpleModule module = new SimpleModule("AlarmModule", new Version(1,0,0,null));
+                    //module.addSerializer(Alarm.class, new AlarmSerializer());
+
+                    /* Visibility and filters required to remove Sugar ORM fields from models */
+                    objectMapper.setVisibility(JsonMethod.ALL, JsonAutoDetect.Visibility.NONE);
+                    objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
+                    objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+                    //objectMapper.registerModule(module);
+                    SimpleBeanPropertyFilter sugarFilter = SimpleBeanPropertyFilter.serializeAllExcept("tableName");
+                    FilterProvider filters = new SimpleFilterProvider().addFilter("sugarFilter", sugarFilter);
+                    objectMapper.writer(filters).writeValue(new DataOutputStream(connection.getOutputStream()), alarm);
+                    Log.w(TAG, objectMapper.writer(filters).writeValueAsString(alarm));
+
                     connection.connect();
                     if (connection.getResponseCode() != 200) {
                         invalidateAuthToken(account, authTokenType);
-                        return null;
+                        return false;
                     }
                     Log.w(TAG, Integer.toString(connection.getResponseCode()));
+                    return true;
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (ProtocolException e) {

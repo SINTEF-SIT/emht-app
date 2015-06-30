@@ -3,27 +3,23 @@ package sintef.android.emht_app.models;
 import com.orm.SugarRecord;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonFilter;
 
 import java.io.Serializable;
 
 /**
  * Created by iver on 12/06/15.
  */
+
+@JsonFilter("sugarFilter")
 public class AlarmAttendant extends SugarRecord<AlarmAttendant> implements Serializable {
 
     @JsonProperty("id")
     private Long alarmAttendantId;
-
     private String username;
     private int role;
 
     public AlarmAttendant() {}
-
-    public AlarmAttendant(Long alarmAttendantId, String username, int role) {
-        this.alarmAttendantId = alarmAttendantId;
-        this.username = username;
-        this.role = role;
-    }
 
     public Long getAlarmAttendantId() {
         return alarmAttendantId;

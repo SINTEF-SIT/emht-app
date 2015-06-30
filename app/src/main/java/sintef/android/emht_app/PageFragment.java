@@ -34,6 +34,7 @@ public class PageFragment extends Fragment {
                 break;
             case 2:
                 fragment = new AssessmentFragment();
+                DashboardActivity.setAssessmentFragment((AssessmentFragment) fragment);
                 break;
             case 3:
                 fragment = new ActionsFragment();

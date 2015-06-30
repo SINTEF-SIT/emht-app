@@ -3,17 +3,19 @@ package sintef.android.emht_app.models;
 import com.orm.SugarRecord;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonFilter;
 
 import java.io.Serializable;
 
 /**
  * Created by iver on 12/06/15.
  */
+
+@JsonFilter("sugarFilter")
 public class Patient extends SugarRecord<Patient> implements Serializable {
 
     @JsonProperty("id")
     private Long patientId;
-
     private String name;
     private String address;
     private Integer age;
@@ -22,16 +24,6 @@ public class Patient extends SugarRecord<Patient> implements Serializable {
     private String obs;
 
     public Patient() {}
-
-    public Patient(Long patientId, String name, String address, Integer age, String phoneNumber, String personalNumber, String obs) {
-        this.patientId = patientId;
-        this.name = name;
-        this.address = address;
-        this.age = age;
-        this.phoneNumber = phoneNumber;
-        this.personalNumber = personalNumber;
-        this.obs = obs;
-    }
 
     public Long getPatientId() {
         return patientId;

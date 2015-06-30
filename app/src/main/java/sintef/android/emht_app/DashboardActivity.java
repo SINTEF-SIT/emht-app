@@ -1,27 +1,23 @@
 package sintef.android.emht_app;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v4.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.support.design.widget.TabLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
@@ -41,7 +37,7 @@ public class DashboardActivity extends FragmentActivity {
 
     private final String TAG = this.getClass().getSimpleName();
     private IncidentFragment incidentFragment;
-    private AssessmentFragment assessmentFragment;
+    private static AssessmentFragment assessmentFragment;
     private RegistrationFragment registrationFragment;
     ViewPager viewPager;
     private final String ALARM_ID = "alarm_id";
@@ -57,7 +53,7 @@ public class DashboardActivity extends FragmentActivity {
         if (getResources().getBoolean(R.bool.isTablet)) {
             RegistrationFragment registrationFragment = new RegistrationFragment();
             registrationFragment.setArguments(getIntent().getExtras());
-            AssessmentFragment assessmentFragment = new AssessmentFragment();
+            assessmentFragment = new AssessmentFragment();
             assessmentFragment.setArguments(getIntent().getExtras());
             ActionsFragment actionsFragment = new ActionsFragment();
             actionsFragment.setArguments(getIntent().getExtras());
@@ -85,7 +81,6 @@ public class DashboardActivity extends FragmentActivity {
                     .commit();
         }
 
-
         //((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
         //        Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID)).getNotes()
         //);
@@ -93,6 +88,10 @@ public class DashboardActivity extends FragmentActivity {
         serverSync.putExtra("account_id", getIntent().getExtras().getInt("account_id"));
         serverSync.putExtra("auth_token_type", "dummytoken");
         startService(serverSync);
+    }
+
+    public static void setAssessmentFragment(AssessmentFragment fragment) {
+        assessmentFragment = fragment;
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -108,8 +107,18 @@ public class DashboardActivity extends FragmentActivity {
 
             binder.setListener(new BoundServiceListener() {
                 @Override
-                public void showErrorDialog(int errorCode) {
-                    buildErrorDialog(errorCode);
+                public void showGooglePlayServicesErrorDialog(int errorCode) {
+                    buildGooglePlayServicesErrorDialog(errorCode);
+                }
+
+                @Override
+                public void showAlarmTransmitComplete() {
+                    // show toast with message?
+                }
+
+                @Override
+                public void updateSensors() {
+                    assessmentFragment.updateSensors();
                 }
             });
         }
@@ -120,7 +129,7 @@ public class DashboardActivity extends FragmentActivity {
         }
     };
 
-    private void buildErrorDialog(int errorCode) {
+    private void buildGooglePlayServicesErrorDialog(int errorCode) {
         if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
             GooglePlayServicesUtil.getErrorDialog(errorCode, this, 9000, new DialogInterface.OnCancelListener() {
                 @Override
@@ -130,6 +139,7 @@ public class DashboardActivity extends FragmentActivity {
             }).show();
         }
     }
+
 
     @Override
     protected void onStart() {
@@ -216,7 +226,7 @@ public class DashboardActivity extends FragmentActivity {
         alarm.save();
         // send json to some endpoint...
 
-        if (mBound) mServerSync.transmitAlarm(alarm);
+        if (mBound) mServerSync.addAlarmToTransmitQueue(alarm);
         else Log.w(TAG, "serversync not bound!");
     }
 

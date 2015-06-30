@@ -3,29 +3,24 @@ package sintef.android.emht_app.models;
 import com.orm.SugarRecord;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonFilter;
 
 import java.io.Serializable;
 
 /**
  * Created by iver on 12/06/15.
  */
+
+@JsonFilter("sugarFilter")
 public class Callee extends SugarRecord<Callee> implements Serializable {
 
     @JsonProperty("id")
     private Long calleeId;
-
     private String name;
     private String address;
     private String phoneNumber; // TODO: add validation format to the phoneNumber
 
     public Callee() {}
-
-    public Callee(Long calleeId, String name, String address, String phoneNumber) {
-        this.calleeId = calleeId;
-        this.name = name;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-    }
 
     public Long getCalleeId() {
         return calleeId;

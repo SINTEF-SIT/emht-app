@@ -16,8 +16,7 @@ allprojects {
     repositories {
         jcenter()
         mavenCentral()
-        maven {
-            url "http://mvnrepository.com/artifact"
-        }
+        maven { url "http://mvnrepository.com/artifact" }
+        maven { url "https://jitpack.io" }
     }
 }
