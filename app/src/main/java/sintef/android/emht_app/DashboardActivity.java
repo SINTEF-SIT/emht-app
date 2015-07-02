@@ -118,9 +118,12 @@ public class DashboardActivity extends FragmentActivity {
 
                 @Override
                 public void updateSensors() {
-                    assessmentFragment.updateSensors();
+                    //assessmentFragment.updateSensors();
                 }
             });
+
+            //if (getIntent().getExtras().getLong(ALARM_ID) != 0L) mServerSync.updateSensors(getIntent().getExtras().getLong(ALARM_ID));
+            if (getIntent().getExtras().getLong(ALARM_ID) != 0L) mServerSync.updateSensors(6L);
         }
 
         @Override

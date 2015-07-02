@@ -1,5 +1,6 @@
 package sintef.android.emht_app.fragments;
 
+import android.accounts.AccountManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,22 +34,23 @@ public class IncidentFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName();
     private ArrayAdapter<Alarm> assignedAlarmsAdapter;
     private List<Alarm> assignedAlarms;
+    private String username;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View incidentView = inflater.inflate(R.layout.fragment_incident, container, false);
         final ListView assignedAlarmsListView = (ListView) incidentView.findViewById(R.id.assignedAlarms);
+        username = AccountManager.get(getActivity()).getAccountsByType("sintef.android.emht_app")[0].name;
         assignedAlarms = new ArrayList<Alarm>();
-        assignedAlarms.addAll(Alarm.listAll(Alarm.class));
-        for (Alarm alarm : Alarm.listAll(Alarm.class)) Log.w(TAG, "alarm: " + alarm.getType());
+        assignedAlarms.addAll(Alarm.find(Alarm.class, "attendant.username = ?", username));
+        //assignedAlarms.addAll(Alarm.listAll(Alarm.class));
         assignedAlarmsAdapter = new AlarmAdapter(getActivity(), R.layout.listitem_alarm, assignedAlarms);
         assignedAlarmsListView.setAdapter(assignedAlarmsAdapter);
 
         assignedAlarmsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.w(TAG, "clicked item: " + position);
                 ((IncidentActivity) getActivity()).selectAlarm(((Alarm) parent.getItemAtPosition(position)).getId());
             }
         });
@@ -84,8 +86,7 @@ public class IncidentFragment extends Fragment {
                 return true;
             }
         });
-
-        ((TextView) incidentView.findViewById(R.id.usernameTextView)).setText("iver"); // should probably not
+        ((TextView) incidentView.findViewById(R.id.usernameTextView)).setText(username); // should probably not
         return incidentView;
     }
 

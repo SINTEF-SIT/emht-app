@@ -32,7 +32,8 @@ public class MainActivity extends FragmentActivity {
     private String authToken;
     //private Intent incidientActivity;
     //private Location previousLocation;
-    private Intent dashboardActivity;
+    //private Intent dashboardActivity;
+    private Intent mapsActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,35 +43,31 @@ public class MainActivity extends FragmentActivity {
 
         Log.w(TAG, "onCreate");
 
-        /* check if google play services is installed
-           TODO: force user to install
-         */
         checkGooglePlayServices(this);
+
+        //dashboardActivity = new Intent(this, DashboardActivity.class);
+        //dashboardActivity.putExtra("account_id", 0);
+        //dashboardActivity.putExtra("auth_token_type", "dummytoken");
+
+        mapsActivity = new Intent(this, MapsActivity.class);
+        mapsActivity.putExtra("account_id", 0);
+        mapsActivity.putExtra("auth_token_type", "dummytoken");
+
+        /* Retrieve first alarm from database.
+           If no alarms are available (i.e. first login) start the app without an alarm selected  */
+        //List<Alarm> firstAlarm = Alarm.findWithQuery(Alarm.class, "select * from alarm order by ROWID asc limit 1");
+        //if (firstAlarm.size() > 0) dashboardActivity.putExtra("alarm_id", firstAlarm.get(0).getId());
 
         /* check if there exists account(s) */
         switch (mAccountManager.getAccountsByType(ACCOUNT_TYPE).length) {
             case 0:
                 addNewAccount();
                 break;
-            case 1:
-                getExistingAccountAuthToken(mAccountManager.getAccountsByType(ACCOUNT_TYPE)[0], "dummytoken");
-                break;
             default:
-                /* there exists more than one account. allow user to select account */
-                showAccountPicker("dummytoken");
+                //startActivity(dashboardActivity);
+                startActivity(mapsActivity);
                 break;
         }
-        //incidientActivity = new Intent(this, IncidentActivity.class);
-        //incidientActivity.putExtra("account_id", 0);
-        //incidientActivity.putExtra("auth_token_type", "dummytoken");
-        dashboardActivity = new Intent(this, DashboardActivity.class);
-        dashboardActivity.putExtra("account_id", 0);
-        dashboardActivity.putExtra("auth_token_type", "dummytoken");
-
-        /* Retrieve first alarm from database.
-           If no alarms are available (i.e. first login) start the app without an alarm selected  */
-        List<Alarm> firstAlarm = Alarm.findWithQuery(Alarm.class, "select * from alarm order by ROWID asc limit 1");
-        if (firstAlarm.size() > 0) dashboardActivity.putExtra("alarm_id", firstAlarm.get(0).getId());
     }
 
     /**
@@ -93,7 +90,6 @@ public class MainActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         Log.w(TAG, "onResume");
-        startActivity(dashboardActivity);
     }
 
     @Override
@@ -109,6 +105,7 @@ public class MainActivity extends FragmentActivity {
                     Bundle bnd = future.getResult();
                     Log.w(TAG, "Account was created");
                     Log.d(TAG, "AddNewAccount Bundle is " + bnd);
+                    startActivity(mapsActivity);
 
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -2,6 +2,7 @@ package sintef.android.emht_app.account;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.OnAccountsUpdateListener;
 import android.app.Service;
@@ -12,21 +13,17 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import org.codehaus.jackson.Version;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonMethod;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.map.ser.FilterProvider;
 import org.codehaus.jackson.map.ser.impl.SimpleBeanPropertyFilter;
 import org.codehaus.jackson.map.ser.impl.SimpleFilterProvider;
@@ -47,10 +44,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.greenrobot.event.EventBus;
-import sintef.android.emht_app.MainActivity;
 import sintef.android.emht_app.events.NewAlarmEvent;
 import sintef.android.emht_app.models.Alarm;
-import sintef.android.emht_app.models.AlarmSerializer;
+import sintef.android.emht_app.models.Patient;
+import sintef.android.emht_app.models.SensorData;
+import sintef.android.emht_app.utils.Constants;
 
 /**
  * Created by iver on 24/06/15.
@@ -65,7 +63,8 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
     private String authTokenType;
     private String authToken;
     private int accountId;
-    private Timer poller;
+    private Timer alarmPollTimer;
+    private Timer sensorPollTimer;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     IBinder mBinder = new LocalBinder();
@@ -82,18 +81,25 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
         mAccountManager = AccountManager.get(getApplicationContext());
         mAccountManager.addOnAccountsUpdatedListener(this, null, false);
         buildGoogleApiClient();
+
+        authTokenType = Constants.AUTH_TOKEN_TYPE;
+        if (mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE).length > 0) {
+            account = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE)[Constants.ACCOUNT_INDEX];
+            startSync();
+        }
+
     }
 
     private void stopSync() {
         Log.w(TAG, "stopping timer for polling");
-        if (poller != null) poller.cancel();
+        if (alarmPollTimer != null) alarmPollTimer.cancel();
         mGoogleApiClient.disconnect();
     }
 
     private void startSync() {
         Log.w(TAG, "starting timer for polling");
-        poller = new Timer();
-        poller.scheduleAtFixedRate(new TimerTask() {
+        alarmPollTimer = new Timer();
+        alarmPollTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 poll();
@@ -104,12 +110,9 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        accountId = intent.getExtras().getInt("account_id");
-        authTokenType = intent.getExtras().getString("auth_token_type");
-        if (mAccountManager.getAccountsByType("sintef.android.emht_app").length > 0) {
-            account = mAccountManager.getAccountsByType("sintef.android.emht_app")[accountId];
-            startSync();
-        }
+        //accountId = intent.getExtras().getInt("account_id");
+        //authTokenType = intent.getExtras().getString("auth_token_type");
+
         return flags;
     }
 
@@ -384,5 +387,53 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
                 return null;
             }
         }.execute();
+    }
+
+    public void startSensorPolling() {
+        Log.w(TAG, "starting sensor polling");
+        sensorPollTimer = new Timer();
+        sensorPollTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                poll();
+            }
+        }, 0, 10000); // poll every 10 seconds
+    }
+
+    public void stopSensorPolling() { sensorPollTimer.cancel(); }
+
+    public void updateSensors(long patientId) {
+        Log.w(TAG, "polling server for sensor datas");
+        new AsyncTask<Long, Void, Void>() {
+
+            String json = null;
+
+            @Override
+            protected Void doInBackground(Long... params) {
+                /* poll server for sensor datas. publish on eventbus */
+                try {
+                    json = readUrl("http://129.241.105.197:9000/component/" + Long.toString(params[0]));
+                    if (json == null) return null;
+                    Log.w(TAG, "got: " + json);
+
+                    JSONArray readings = new JSONObject(json).getJSONArray("readings");
+
+                    for (int i = 0; i < readings.length(); i++) {
+                        JSONObject reading = readings.getJSONObject(i);
+                        /* add reading to db if it does not exist */
+                        if (SensorData.find(SensorData.class, "sensor_data_id = ?", Long.toString(reading.getLong("id"))).size() == 0) {
+                            SensorData sensorData = objectMapper.readValue(reading.toString(), SensorData.class);
+                            sensorData.setPatient(Patient.findById(Patient.class, params[0]));
+                            sensorData.save();
+                            mEventBus.post(sensorData);
+                            Log.w(TAG, "added new sensor data to db");
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.execute(patientId);
     }
 }

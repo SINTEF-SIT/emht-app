@@ -18,5 +18,6 @@ allprojects {
         mavenCentral()
         maven { url "http://mvnrepository.com/artifact" }
         maven { url "https://jitpack.io" }
+        maven { url 'https://repository-achartengine.forge.cloudbees.com/snapshot/'}
     }
 }

@@ -85,4 +85,7 @@
     <string name="callAMK">Call AMK</string>
     <string name="callFireDepartment">Call Fire Department</string>
 
+    <!-- maps fragment -->
+    <string name="dialog_select_alarm">Make this alarm your current assignment?</string>
+
 </resources>

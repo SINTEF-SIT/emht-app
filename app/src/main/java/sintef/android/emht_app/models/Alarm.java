@@ -42,7 +42,8 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
     public Alarm() {}
 
     /* Sugar ORM doesn't support null java.util.Date objects.
-       With hack below the app will not work with pre 1970-01-01 dates */
+       With hack below the app will not work with pre 1970-01-01 dates.
+       Annotation @JsonProperty needed at getters. */
 
     private Date setSugarORMNullDateHack(Date date) {
         if (date != null) return date;
@@ -200,5 +201,14 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
 
     public void setFieldAssessment(Assessment fieldAssessment) {
         this.fieldAssessment = fieldAssessment;
+    }
+
+    public String getTypeInNaturalLanguage() {
+        switch (this.type) {
+            case ("safety_alarm"):
+                return "Safety";
+            default:
+                return "Undefined";
+        }
     }
 }

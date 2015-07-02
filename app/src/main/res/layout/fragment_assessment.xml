@@ -274,10 +274,13 @@
             android:textSize="20dp"
             android:text="@string/sensors"/>
 
-        <com.github.mikephil.charting.charts.LineChart
+        <LinearLayout
             android:id="@+id/sensors_chart"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="300dp"
+            android:orientation="horizontal"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -290,8 +293,7 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:id="@+id/sensorsLog"
-            android:inputType="textMultiLine"
-            android:text="haha\nlol\nderp\nherp"/>
+            android:inputType="textMultiLine"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -311,8 +313,7 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:id="@+id/cautionLog"
-            android:inputType="textMultiLine"
-            android:text="Har kols.\nEr voldelig.\n"/>
+            android:inputType="textMultiLine"/>
 
 
     </LinearLayout>
