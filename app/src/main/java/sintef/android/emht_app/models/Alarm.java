@@ -1,15 +1,20 @@
 package sintef.android.emht_app.models;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonFilter;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import sintef.android.emht_app.R;
 
 /**
  * Created by iver on 12/06/15.
@@ -37,6 +42,8 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
     private Assessment assessment;
     private Assessment fieldAssessment;
     private boolean finished;
+    @JsonIgnore
+    private boolean active;
 
     /* empty constructor required by sugar */
     public Alarm() {}
@@ -203,12 +210,33 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
         this.fieldAssessment = fieldAssessment;
     }
 
-    public String getTypeInNaturalLanguage() {
+    public int getTypeInNaturalLanguage() {
         switch (this.type) {
             case ("safety_alarm"):
-                return "Safety";
+                return R.string.safety_alarm;
+            case ("phone"):
+                return R.string.phone_alarm;
             default:
-                return "Undefined";
+                return R.string.undefined_alarm;
         }
+    }
+
+    public int getImageResourceForType() {
+        switch (this.type) {
+            case ("safety_alarm"):
+                return R.mipmap.ic_safety_alarm;
+            case ("phone"):
+                return R.mipmap.ic_phone_alarm;
+            default:
+                return R.mipmap.ic_launcher;
+        }
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

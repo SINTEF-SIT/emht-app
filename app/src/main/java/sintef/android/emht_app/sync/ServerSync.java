@@ -1,8 +1,7 @@
-package sintef.android.emht_app.account;
+package sintef.android.emht_app.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.OnAccountsUpdateListener;
 import android.app.Service;
@@ -44,6 +43,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.greenrobot.event.EventBus;
+import sintef.android.emht_app.account.BoundServiceListener;
 import sintef.android.emht_app.events.NewAlarmEvent;
 import sintef.android.emht_app.models.Alarm;
 import sintef.android.emht_app.models.Patient;
@@ -239,8 +239,8 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
                             Alarm alarmObj = objectMapper.readValue(alarm.toString(), Alarm.class);
                             alarmObj.getPatient().save();
                             alarmObj.getCallee().save();
-                            alarmObj.getAssessment().save();
                             alarmObj.getAssessment().getNmi().save();
+                            alarmObj.getAssessment().save();
                             alarmObj.getAttendant().save();
                             alarmObj.getMobileCareTaker().save();
                             alarmObj.save();
@@ -340,6 +340,10 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
 
     public void addAlarmToTransmitQueue(Alarm alarm) {
         transmitAlarm(alarm);
+        finishAlarm(alarm.getId());
+        alarm.setFinished(true);
+        alarm.setActive(false);
+        alarm.save();
     }
 
     public void transmitAlarm(final Alarm alarm) {
@@ -400,7 +404,7 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
         }, 0, 10000); // poll every 10 seconds
     }
 
-    public void stopSensorPolling() { sensorPollTimer.cancel(); }
+    public void stopSensorPolling() { if (sensorPollTimer != null) sensorPollTimer.cancel(); }
 
     public void updateSensors(long patientId) {
         Log.w(TAG, "polling server for sensor datas");
@@ -435,5 +439,38 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
                 return null;
             }
         }.execute(patientId);
+    }
+
+    private void finishAlarm(final Long alarmId) {
+
+
+
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    getExistingAccountAuthToken(account, authTokenType);
+                    URL url = new URL("http://129.241.105.197:9000/alarm/" + Long.toString(alarmId) + "/finish");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setDoOutput(true);
+                    connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Cookie", authToken);
+                    connection.connect();
+                    if (connection.getResponseCode() != 200) {
+                        invalidateAuthToken(account, authTokenType);
+                        return false;
+                    }
+                    return true;
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (ProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.execute();
     }
 }

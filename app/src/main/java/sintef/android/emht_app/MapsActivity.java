@@ -32,19 +32,16 @@ import com.google.maps.android.ui.IconGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
-import sintef.android.emht_app.account.BoundServiceListener;
-import sintef.android.emht_app.account.ServerSync;
+import sintef.android.emht_app.sync.ServerSync;
 import sintef.android.emht_app.events.NewAlarmEvent;
 import sintef.android.emht_app.models.Alarm;
-import sintef.android.emht_app.models.SensorData;
-import sintef.android.emht_app.utils.AlarmComparator;
 import sintef.android.emht_app.utils.Constants;
+import sintef.android.emht_app.utils.Helper;
 
 /**
  * Created by iver on 01/07/15.
@@ -52,11 +49,11 @@ import sintef.android.emht_app.utils.Constants;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private final String TAG = this.getClass().getSimpleName();
-    private Map<MarkerOptions, Alarm> markerMap;
+    private Map<LatLng, Alarm> markerMap;
     private String firstAlarmMarkerId;
     private ServerSync mServerSync;
     private boolean mBound = false;
-    private GoogleMap myGoogleMap;
+    private GoogleMap googleMap;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -92,6 +89,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Helper.getAllUnfinishedAlarmsSorted().size() > 0) updateMarkers();
+        else if (googleMap != null) googleMap.clear();
+    }
+
     private void addNewAccount() {
         final AccountManagerFuture<Bundle> future = AccountManager.get(this).addAccount(Constants.ACCOUNT_TYPE, null, null, null, this, new AccountManagerCallback<Bundle>() {
             @Override
@@ -111,7 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        myGoogleMap = googleMap;
+        this.googleMap = googleMap;
         Log.w(TAG, "map ready");
         googleMap.setMyLocationEnabled(true);
 
@@ -128,7 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         builder.setMessage(R.string.dialog_select_alarm)
                                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        selectAlarm(markerMap.get(marker).getId());
+                                        selectAlarm(markerMap.get(marker.getPosition()).getId());
                                     }
                                 })
                                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -143,7 +157,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        if (Alarm.listAll(Alarm.class).size() == 0) return; // no alarms in queue. don't build markers
+        if (Helper.getAllUnfinishedAlarmsSorted().size() == 0) return; // no alarms in queue. don't build markers
 
         /* TODO: Find out how to set the map zoom before/while the map loads */
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
@@ -157,17 +171,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void updateMarkers() {
         Log.w(TAG, "updating markers");
-        myGoogleMap.clear();
+        if (googleMap != null) googleMap.clear();
         new AsyncTask<Void, Void, List<MarkerOptions>>() {
             LatLngBounds.Builder builder;
             @Override
             protected List<MarkerOptions> doInBackground(Void... params) {
                 builder = new LatLngBounds.Builder();
                 List<MarkerOptions> markerOptions = new ArrayList<>();
-                List<Alarm> alarmList = Alarm.listAll(Alarm.class);
-                Collections.sort(alarmList, new AlarmComparator());
                 int queueNumber = 1;
-                for (Alarm alarm : alarmList) {
+                for (Alarm alarm : Helper.getAllUnfinishedAlarmsSorted()) {
                     LatLng latLng = findLatLng(alarm);
 
                     // custom markers showing the queue number of the alarm
@@ -176,7 +188,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     iconGenerator.setTextAppearance(R.style.map_icon_font);
                     Bitmap bitmap = iconGenerator.makeIcon("     " + Integer.toString(queueNumber));
 
-                    String snippet = "Alarm type: " + alarm.getTypeInNaturalLanguage() + ".";
+                    String snippet = "Alarm type: " + getResources().getString(alarm.getTypeInNaturalLanguage()) + ".";
                     if (queueNumber == 1) snippet += " Tap to select.";
 
                     MarkerOptions marker = new MarkerOptions()
@@ -186,7 +198,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .icon(BitmapDescriptorFactory.fromBitmap(bitmap));
 
                     builder.include(marker.getPosition());
-                    markerMap.put(marker, alarm);
+                    markerMap.put(marker.getPosition(), alarm);
                     queueNumber++;
                     markerOptions.add(marker);
                 }
@@ -198,13 +210,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.w(TAG, "onPostExecute");
                 int queueNumber = 1;
                 for (MarkerOptions marker : markerOptions) {
-                    if (queueNumber == 1) firstAlarmMarkerId = myGoogleMap.addMarker(marker).getId();
-                    else myGoogleMap.addMarker(marker);
+                    if (queueNumber == 1) firstAlarmMarkerId = googleMap.addMarker(marker).getId();
+                    else googleMap.addMarker(marker);
                     queueNumber++;
                 }
                 int padding = 400; // offset from edges of the map in pixels
                 LatLngBounds bounds = builder.build();
-                myGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
             }
 
         }.execute();
@@ -225,9 +237,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void selectAlarm(Long alarmId) {
-
+        Alarm.findById(Alarm.class, alarmId).setActive(true);
+        Intent dashboardActivity = new Intent(this, DashboardActivity.class);
+        dashboardActivity.putExtra(Constants.ALARM_ID, alarmId);
+        startActivity(dashboardActivity);
     }
 
+    @SuppressWarnings("unused")
     public void onEvent(NewAlarmEvent newAlarmEvent) {
         Log.w(TAG, "received new alarm event");
         this.runOnUiThread(new Runnable() {

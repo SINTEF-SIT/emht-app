@@ -10,6 +10,8 @@ import sintef.android.emht_app.models.Alarm;
 public class AlarmComparator implements Comparator<Alarm> {
     @Override
     public int compare(Alarm lhs, Alarm rhs) {
+        if (lhs.getDispatchingTime().before(rhs.getDispatchingTime())) return -1;
+        if (lhs.getDispatchingTime().after(rhs.getDispatchingTime())) return 1;
         return 0;
     }
 }

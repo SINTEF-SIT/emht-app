@@ -15,20 +15,24 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import sintef.android.emht_app.account.BoundServiceListener;
-import sintef.android.emht_app.account.ServerSync;
+import sintef.android.emht_app.sync.ServerSync;
 import sintef.android.emht_app.fragments.ActionsFragment;
 import sintef.android.emht_app.fragments.AssessmentFragment;
 import sintef.android.emht_app.fragments.DrawerFragment;
 import sintef.android.emht_app.fragments.IncidentFragment;
 import sintef.android.emht_app.fragments.RegistrationFragment;
 import sintef.android.emht_app.models.Alarm;
+import sintef.android.emht_app.models.Assessment;
+import sintef.android.emht_app.models.NMI;
 
 /**
  * Created by iver on 10/06/15.
@@ -44,6 +48,7 @@ public class DashboardActivity extends FragmentActivity {
     private ServerSync mServerSync;
     private boolean mBound = false;
     private ActionBarDrawerToggle mDrawerToggle;
+    private SlidingUpPanelLayout slidingUpPanelLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,20 +86,35 @@ public class DashboardActivity extends FragmentActivity {
                     .commit();
         }
 
-        //((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
-        //        Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID)).getNotes()
-        //);
-        Intent serverSync = new Intent(this, ServerSync.class);
-        serverSync.putExtra("account_id", getIntent().getExtras().getInt("account_id"));
-        serverSync.putExtra("auth_token_type", "dummytoken");
-        startService(serverSync);
+        slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        findViewById(R.id.sliding_layout).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.w(TAG, "on touch");
+                if (slidingUpPanelLayout != null &&
+                        (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED || slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
+                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                }
+                return false;
+            }
+        });
+
+        ((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
+                Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID)).getNotes()
+        );
+//        Intent serverSync = new Intent(this, ServerSync.class);
+//        serverSync.putExtra("account_id", getIntent().getExtras().getInt("account_id"));
+//        serverSync.putExtra("auth_token_type", "dummytoken");
+//        startService(serverSync);
     }
 
     public static void setAssessmentFragment(AssessmentFragment fragment) {
         assessmentFragment = fragment;
     }
 
-    /** Defines callbacks for service binding, passed to bindService() */
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -163,8 +183,19 @@ public class DashboardActivity extends FragmentActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        mServerSync.stopSensorPolling();
+    }
+
+    @Override
     public void onBackPressed() {
-        dismissDialog();
+        if (slidingUpPanelLayout != null &&
+                (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED || slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
+            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void dismissDialog() {
@@ -217,20 +248,41 @@ public class DashboardActivity extends FragmentActivity {
     }
 
 
-
     private void updateAlarmBeforeExit() {
         // gather entered data and send to server
         // check if data has changed or not
         Alarm alarm = Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID));
         View view = getWindow().getDecorView();
 
-        alarm.setNotes(((EditText)view.findViewById(R.id.notes)).getText().toString());
+        alarm.setNotes(((EditText) view.findViewById(R.id.notes)).getText().toString());
 
+        Assessment fieldAssessment = new Assessment();
+        NMI fieldNmi = new NMI();
+
+        fieldNmi.setConscious(getRadioGroupAnswer(view, R.id.radioAssessmentQuestion1Yes, R.id.radioAssessmentQuestion1No));
+        fieldNmi.setBreathing(getRadioGroupAnswer(view, R.id.radioAssessmentQuestion2Yes, R.id.radioAssessmentQuestion2No));
+        fieldNmi.setMovement(getRadioGroupAnswer(view, R.id.radioAssessmentQuestion3Yes, R.id.radioAssessmentQuestion3No));
+        fieldNmi.setStanding(getRadioGroupAnswer(view, R.id.radioAssessmentQuestion4Yes, R.id.radioAssessmentQuestion4No));
+        fieldNmi.setTalking(getRadioGroupAnswer(view, R.id.radioAssessmentQuestion5Yes, R.id.radioAssessmentQuestion5No));
+        fieldAssessment.setPatientInformationChecked(true);
+        fieldAssessment.setSensorsChecked(true);
+
+        fieldNmi.save();
+        fieldAssessment.setNmi(fieldNmi);
+        fieldAssessment.save();
+        alarm.setFieldAssessment(fieldAssessment);
         alarm.save();
-        // send json to some endpoint...
 
+        // send json to some endpoint...
         if (mBound) mServerSync.addAlarmToTransmitQueue(alarm);
         else Log.w(TAG, "serversync not bound!");
+    }
+
+    private Boolean getRadioGroupAnswer(View view, int yesId, int noId) {
+        Boolean result;
+        if (((RadioButton) view.findViewById(yesId)).isChecked()) return true;
+        if (((RadioButton) view.findViewById(noId)).isChecked()) return false;
+        return null;
     }
 
     public void onRadioButtonClicked(View view) {
@@ -238,7 +290,7 @@ public class DashboardActivity extends FragmentActivity {
         boolean checked = ((RadioButton) view).isChecked();
 
         // Check which radio button was clicked
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.radioAssessmentQuestion1Yes:
                 if (checked)
                     // Pirates are the best
@@ -289,4 +341,5 @@ public class DashboardActivity extends FragmentActivity {
         finish();
         startActivity(dashboard);
     }
+
 }

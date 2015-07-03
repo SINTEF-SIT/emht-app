@@ -17,6 +17,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -26,6 +27,8 @@ import sintef.android.emht_app.AlarmAdapter;
 import sintef.android.emht_app.R;
 import sintef.android.emht_app.events.NewAlarmEvent;
 import sintef.android.emht_app.models.Alarm;
+import sintef.android.emht_app.utils.AlarmComparator;
+import sintef.android.emht_app.utils.Helper;
 
 /**
  * Created by iver on 10/06/15.
@@ -43,18 +46,18 @@ public class DrawerFragment extends Fragment {
         final View incidentView = inflater.inflate(R.layout.fragment_incident, container, false);
         final ListView assignedAlarmsListView = (ListView) incidentView.findViewById(R.id.assignedAlarms);
         username = AccountManager.get(getActivity()).getAccountsByType("sintef.android.emht_app")[0].name;
-        assignedAlarms = new ArrayList<Alarm>();
-        assignedAlarms.addAll(Alarm.listAll(Alarm.class));
+        assignedAlarms = new ArrayList<>();
+        assignedAlarms.addAll(Helper.getAllUnfinishedAndInactiveAlarmsSorted());
         assignedAlarmsAdapter = new AlarmAdapter(getActivity(), R.layout.listitem_alarm, assignedAlarms);
         assignedAlarmsListView.setAdapter(assignedAlarmsAdapter);
 
-        assignedAlarmsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.w(TAG, "clicked item: " + position);
-                ((DashboardActivity) getActivity()).selectAlarm(((Alarm) parent.getItemAtPosition(position)).getId());
-            }
-        });
+//        assignedAlarmsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Log.w(TAG, "clicked item: " + position);
+//                ((DashboardActivity) getActivity()).selectAlarm(((Alarm) parent.getItemAtPosition(position)).getId());
+//            }
+//        });
 
         assignedAlarmsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override

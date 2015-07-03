@@ -28,14 +28,16 @@
     <string name="no">No</string>
     <string name="log">Log</string>
     <string name="notes">Notes</string>
-    <string name="completeIncident">Send to central</string>
     <string name="dismissIncident">Dismiss</string>
     <string name="notesHint">Enter notes here...</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="dialog_dismiss">Are you sure you want to dismiss this alarm?</string>
-    <string name="dialog_approve">Are you sure you want to send the alarm to central?</string>
 
+    <!-- alarm types -->
+    <string name="safety_alarm">Safety</string>
+    <string name="phone_alarm">Phone</string>
+    <string name="undefined_alarm">Undefined</string>
 
     <!-- tab fragment -->
     <string name="tabRegistration">Registration</string>
@@ -43,7 +45,7 @@
     <string name="tabActions">Actions</string>
 
     <!-- incident fragment -->
-    <string name="assignedAlarmsHeader">Alarms assigned to me</string>
+    <string name="assignedAlarmsHeader">Alarm queue</string>
     <string name="assignedAlarmsHeader2">Placeholder</string>
     <string name="popup_maps">Start navigation</string>
     <string name="logged_in_as">Logged in as:</string>
@@ -59,9 +61,8 @@
     <string name="name">Name:</string>
     <string name="registrationLog">Log:</string>
 
-
     <!-- assessment fragment -->
-    <string name="nmiLog">NMI Log</string>
+    <string name="nmiLog">NMI log from central</string>
     <string name="nmi">NMI</string>
     <string name="assessmentQuestion1">Is the patient conscious?</string>
     <string name="assessmentQuestion2">Is the patient breathing normally?</string>
@@ -70,6 +71,9 @@
     <string name="assessmentQuestion5">Can the patient talk?</string>
     <string name="sensors">Sensors</string>
     <string name="caution">OBS!</string>
+    <string name="patient_information_checked">Patient information checked?</string>
+    <string name="sensors_checked">Sensors checked?</string>
+    <string name="not_answered">Not answered</string>
 
     <!-- actions fragment -->
     <string name="distressNumber">Distress Number</string>
@@ -84,6 +88,8 @@
     <string name="callPolice">Call Police</string>
     <string name="callAMK">Call AMK</string>
     <string name="callFireDepartment">Call Fire Department</string>
+    <string name="completeIncident">Send to central</string>
+    <string name="dialog_approve">Are you sure you want to send the alarm to central?</string>
 
     <!-- maps fragment -->
     <string name="dialog_select_alarm">Make this alarm your current assignment?</string>

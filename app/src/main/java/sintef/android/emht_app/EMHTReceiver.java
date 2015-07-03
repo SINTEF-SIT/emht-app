@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import sintef.android.emht_app.account.ServerSync;
+import sintef.android.emht_app.sync.ServerSync;
 
 /**
  * Created by iver on 02/07/15.

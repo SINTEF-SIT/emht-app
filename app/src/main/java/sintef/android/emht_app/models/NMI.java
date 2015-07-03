@@ -15,16 +15,16 @@ import java.io.Serializable;
 public class NMI extends SugarRecord<NMI> implements Serializable {
 
     @JsonProperty("id")
-    public Long nmiId;
-    public Boolean conscious;
-    public Boolean breathing;
-    public Boolean movement;
-    public Boolean standing;
-    public Boolean talking;
+    private Long nmiId;
+    private Boolean conscious;
+    private Boolean breathing;
+    private Boolean movement;
+    private Boolean standing;
+    private Boolean talking;
 
     public NMI() {}
 
-    public Long getNmiIdId() {
+    public Long getNmiId() {
         return nmiId;
     }
 

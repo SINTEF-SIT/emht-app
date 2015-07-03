@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import de.greenrobot.event.EventBus;
 import sintef.android.emht_app.R;
@@ -31,7 +32,26 @@ public class AssessmentFragment extends Fragment {
         Alarm alarm = Alarm.findById(Alarm.class, alarmId);
         View assessmentView = inflater.inflate(R.layout.fragment_assessment, container, false);
 
+        setNmiLogQuestion(assessmentView, alarm.getAssessment().getNmi().isConscious(), R.id.assessmentLogAnswer1);
+        setNmiLogQuestion(assessmentView, alarm.getAssessment().getNmi().isBreathing(), R.id.assessmentLogAnswer2);
+        setNmiLogQuestion(assessmentView, alarm.getAssessment().getNmi().isMovement(), R.id.assessmentLogAnswer3);
+        setNmiLogQuestion(assessmentView, alarm.getAssessment().getNmi().isStanding(), R.id.assessmentLogAnswer4);
+        setNmiLogQuestion(assessmentView, alarm.getAssessment().getNmi().isTalking(), R.id.assessmentLogAnswer5);
+
+        if (alarm.getAssessment().isPatientInformationChecked()) ((TextView) assessmentView.findViewById(R.id.assessmentLogPatientInformationCheckedAnswer)).setText(getResources().getString(R.string.yes));
+        if (alarm.getAssessment().isSensorsChecked()) ((TextView) assessmentView.findViewById(R.id.assessmentLogSensorsCheckedAnswer)).setText(getResources().getString(R.string.yes));
+
+        ((TextView) assessmentView.findViewById(R.id.cautionLog)).setText(alarm.getPatient().getObs());
+
         return assessmentView;
+    }
+
+    private void setNmiLogQuestion(View view, Boolean answer, int id) {
+        TextView textView = (TextView) view.findViewById(id);
+        if (answer == null) return;
+        if (answer) textView.setText(getResources().getString(R.string.yes));
+        if (!answer) textView.setText(getResources().getString(R.string.no));
+
     }
 
     @Override

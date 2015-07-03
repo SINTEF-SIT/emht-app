@@ -11,8 +11,19 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="6dip"
-        android:contentDescription="TODO"
-        android:src="@mipmap/ic_safety_alarm" />
+        android:src="@drawable/ic_launcher"/>
+
+    <TextView
+        android:id="@+id/assignedAlarmName"
+        android:layout_width="fill_parent"
+        android:layout_height="30dip"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toRightOf="@id/assignedAlarmIcon"
+        android:gravity="center_vertical"
+        android:textSize="16sp"
+        android:text="DISPATCH TIME"/>
 
     <TextView
         android:id="@+id/assignedAlarmDescription"
@@ -23,20 +34,7 @@
         android:layout_toRightOf="@id/assignedAlarmIcon"
         android:ellipsize="marquee"
         android:singleLine="true"
-        android:text="Description"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/assignedAlarmName"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/assignedAlarmDescription"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_toRightOf="@id/assignedAlarmIcon"
-        android:gravity="center_vertical"
-        android:text="Example application"
-        android:textSize="16sp" />
-
+        android:textSize="12sp"
+        android:layout_below="@+id/assignedAlarmName"
+        android:text="INCIDENT ADDRESS"/>
 </RelativeLayout>
