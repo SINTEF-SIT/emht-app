@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "sintef.android.emht_app"
+        applicationId "sintef.android.emht"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
