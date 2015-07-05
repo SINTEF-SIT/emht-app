@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
+import sintef.android.emht.sync.RegistrationIntentService;
 import sintef.android.emht.sync.ServerSync;
 import sintef.android.emht.events.NewAlarmEvent;
 import sintef.android.emht.models.Alarm;
@@ -87,6 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         EventBus.getDefault().register(this);
         Intent intent = new Intent(this, ServerSync.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        startService(new Intent(this, RegistrationIntentService.class));
     }
 
     @Override
