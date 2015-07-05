@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.google.gms:google-services:1.3.0-beta1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -16,8 +17,8 @@ allprojects {
     repositories {
         jcenter()
         mavenCentral()
-        maven {
-            url "http://mvnrepository.com/artifact"
-        }
+        maven { url "http://mvnrepository.com/artifact" }
+        maven { url "https://jitpack.io" }
+        maven { url 'https://repository-achartengine.forge.cloudbees.com/snapshot/'}
     }
 }

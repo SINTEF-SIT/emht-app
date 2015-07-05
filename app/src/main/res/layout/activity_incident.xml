@@ -6,7 +6,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <fragment android:name="sintef.android.emht_app.fragments.IncidentFragment"
+    <fragment android:name="sintef.android.emht.fragments.IncidentFragment"
         android:id="@+id/incident_fragment"
         android:layout_weight="1"
         android:layout_width="0dp"

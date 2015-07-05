@@ -12,7 +12,8 @@
     <android.support.v4.widget.DrawerLayout
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/drawer_layout">
 
         <!-- LinearLayout to display Fragments -->
         <LinearLayout
@@ -46,7 +47,7 @@
                 android:padding="10dp"/>
         </LinearLayout>
 
-        <!-- Listview to display slider menu -->
+        <!-- FrameLayout to display slider menu -->
         <FrameLayout
             android:id="@+id/drawer_fragment"
             android:layout_width="280dp"
