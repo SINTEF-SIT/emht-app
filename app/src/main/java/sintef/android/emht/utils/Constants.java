@@ -12,4 +12,5 @@ public class Constants {
     public static final String ALARM_ID = "alarm_id";
 
     public static final String GCM_NEW_ALARM = "sintef.android.emht.gcm.new_alarm";
+    public static final int GCM_NEW_ALARM_NOTIFICATION_ID = 42;
 }

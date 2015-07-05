@@ -5,6 +5,7 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -106,6 +107,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onResume();
         if (Helper.getAllUnfinishedAlarmsSorted().size() > 0) updateMarkers();
         else if (googleMap != null) googleMap.clear();
+        // Remove notifications from notification panel
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel(Constants.GCM_NEW_ALARM_NOTIFICATION_ID);
     }
 
     private void addNewAccount() {

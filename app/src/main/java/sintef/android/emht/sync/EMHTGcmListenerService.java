@@ -21,7 +21,6 @@ import sintef.android.emht.utils.Constants;
 public class EMHTGcmListenerService extends GcmListenerService {
 
     private final String TAG = this.getClass().getSimpleName();
-    private int mId = 1337;
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
@@ -58,6 +57,6 @@ public class EMHTGcmListenerService extends GcmListenerService {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        mNotificationManager.notify(mId, mBuilder.build());
+        mNotificationManager.notify(Constants.GCM_NEW_ALARM_NOTIFICATION_ID, mBuilder.build());
     }
 }
