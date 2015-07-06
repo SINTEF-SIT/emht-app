@@ -95,8 +95,6 @@
     <string name="dialog_select_alarm">Make this alarm your current assignment?</string>
 
     <!-- GCM -->
-    <string name="pref_key_SENT_TOKEN_TO_SERVER">TOKEN_SENT_TO_SERVER</string>
-    <string name="intent_name_REGISTRATION_COMPLETE">REGISTRATION_COMPLETE</string>
     <string name="gcm_new_alarm">New alarm</string>
 
 </resources>

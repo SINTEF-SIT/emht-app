@@ -36,7 +36,7 @@ public class EMHTGcmListenerService extends GcmListenerService {
     private void buildNewAlarmNotification() {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle("EMHT")
+                .setContentTitle(getResources().getString(R.string.app_name))
                 .setContentText(getResources().getString(R.string.gcm_new_alarm));
         Intent resultIntent = new Intent(this, MapsActivity.class);
         // The stack builder object will contain an artificial back stack for the
@@ -56,6 +56,8 @@ public class EMHTGcmListenerService extends GcmListenerService {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        long[] vibratePattern = {0, 100, 1000};
+        mBuilder.setVibrate(vibratePattern);
         // mId allows you to update the notification later on.
         mNotificationManager.notify(Constants.GCM_NEW_ALARM_NOTIFICATION_ID, mBuilder.build());
     }

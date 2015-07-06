@@ -13,4 +13,6 @@ public class Constants {
 
     public static final String GCM_NEW_ALARM = "sintef.android.emht.gcm.new_alarm";
     public static final int GCM_NEW_ALARM_NOTIFICATION_ID = 42;
+    public static final String pref_key_SENT_TOKEN_TO_SERVER = "TOKEN_SENT_TO_SERVER";
+    public static final String intent_name_REGISTRATION_COMPLETE = "REGISTRATION_COMPLETE";
 }

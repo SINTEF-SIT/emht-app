@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import sintef.android.emht.R;
+import sintef.android.emht.utils.Constants;
 
 /**
  * Created by iver on 7/5/15.
@@ -49,13 +50,13 @@ public class RegistrationIntentService extends IntentService {
                 //          pubSub.subscribe(token, "/topics/" + topic, null);
                 //       }
 
-                sharedPreferences.edit().putBoolean(getString(R.string.pref_key_SENT_TOKEN_TO_SERVER), true).apply();
+                sharedPreferences.edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, true).apply();
             }
         } catch (Exception e) {
             Log.d(TAG, "Failed to complete token refresh", e);
-            sharedPreferences.edit().putBoolean(getString(R.string.pref_key_SENT_TOKEN_TO_SERVER), false).apply();
+            sharedPreferences.edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, false).apply();
         }
         // Notify UI that registration has completed, so the progress indicator can be hidden.
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(getString(R.string.intent_name_REGISTRATION_COMPLETE)));
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.intent_name_REGISTRATION_COMPLETE));
     }
 }

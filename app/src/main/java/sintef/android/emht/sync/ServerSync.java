@@ -104,7 +104,7 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
             public void run() {
                 poll();
             }
-        }, 5000, 30000); // poll every 30 seconds
+        }, 0, 30000); // poll every 30 seconds
         mGoogleApiClient.connect();
     }
 
