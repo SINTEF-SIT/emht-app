@@ -1,12 +1,16 @@
 package sintef.android.emht;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SyncRequest;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
@@ -33,6 +37,7 @@ import sintef.android.emht.fragments.RegistrationFragment;
 import sintef.android.emht.models.Alarm;
 import sintef.android.emht.models.Assessment;
 import sintef.android.emht.models.NMI;
+import sintef.android.emht.utils.Constants;
 
 /**
  * Created by iver on 10/06/15.
@@ -183,9 +188,15 @@ public class DashboardActivity extends FragmentActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (mBound) mServerSync.startSensorPolling();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
-        mServerSync.stopSensorPolling();
+        if (mBound) mServerSync.stopSensorPolling();
     }
 
     @Override
@@ -273,9 +284,24 @@ public class DashboardActivity extends FragmentActivity {
         alarm.setFieldAssessment(fieldAssessment);
         alarm.save();
 
+        Account account = AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE)[0];
+        SyncRequest.Builder mBuilder = new SyncRequest.Builder()
+                .setExpedited(true) // prioritize this sync
+                .setSyncAdapter(account, Constants.PROVIDER_AUTHORITIES)
+                .setManual(true)
+                .syncOnce()
+                .setExtras(new Bundle()); // Bundle mandatory to build request
+
+        ContentResolver.setSyncAutomatically(account, Constants.PROVIDER_AUTHORITIES, true);
+        ContentResolver.requestSync(mBuilder.build());
+
+        alarm.setFinished(true);
+        alarm.setActive(false);
+        alarm.save();
+
         // send json to some endpoint...
-        if (mBound) mServerSync.addAlarmToTransmitQueue(alarm);
-        else Log.w(TAG, "serversync not bound!");
+//        if (mBound) mServerSync.addAlarmToTransmitQueue(alarm);
+//        else Log.w(TAG, "serversync not bound!");
     }
 
     private Boolean getRadioGroupAnswer(View view, int yesId, int noId) {
@@ -283,55 +309,6 @@ public class DashboardActivity extends FragmentActivity {
         if (((RadioButton) view.findViewById(yesId)).isChecked()) return true;
         if (((RadioButton) view.findViewById(noId)).isChecked()) return false;
         return null;
-    }
-
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-
-        // Check which radio button was clicked
-        switch (view.getId()) {
-            case R.id.radioAssessmentQuestion1Yes:
-                if (checked)
-                    // Pirates are the best
-                    break;
-            case R.id.radioAssessmentQuestion1No:
-                if (checked)
-                    // Ninjas rule
-                    break;
-            case R.id.radioAssessmentQuestion2Yes:
-                if (checked)
-                    // Pirates are the best
-                    break;
-            case R.id.radioAssessmentQuestion2No:
-                if (checked)
-                    // Ninjas rule
-                    break;
-            case R.id.radioAssessmentQuestion3Yes:
-                if (checked)
-                    // Pirates are the best
-                    break;
-            case R.id.radioAssessmentQuestion3No:
-                if (checked)
-                    // Ninjas rule
-                    break;
-            case R.id.radioAssessmentQuestion4Yes:
-                if (checked)
-                    // Pirates are the best
-                    break;
-            case R.id.radioAssessmentQuestion4No:
-                if (checked)
-                    // Ninjas rule
-                    break;
-            case R.id.radioAssessmentQuestion5Yes:
-                if (checked)
-                    // Pirates are the best
-                    break;
-            case R.id.radioAssessmentQuestion5No:
-                if (checked)
-                    // Ninjas rule
-                    break;
-        }
     }
 
     public void selectAlarm(long alarmId) {

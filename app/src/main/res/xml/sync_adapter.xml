@@ -1,0 +1,7 @@
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+    android:contentAuthority="sintef.android.emht.provider"
+    android:accountType="sintef.android.emht"
+    android:userVisible="true"
+    android:allowParallelSyncs="false"
+    android:isAlwaysSyncable="false"
+    android:supportsUploading="true"/>

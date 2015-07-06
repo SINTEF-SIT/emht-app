@@ -56,6 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ServerSync mServerSync;
     private boolean mBound = false;
     private GoogleMap googleMap;
+    private boolean neededToCreateAccount = false;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -66,7 +67,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ServerSync.LocalBinder binder = (ServerSync.LocalBinder) service;
             mServerSync = binder.getService();
             mBound = true;
-            mServerSync.startSensorPolling();
+            if (neededToCreateAccount) {
+                mServerSync.poll();
+                mServerSync.updateGcmRegIdIfNeeded();
+            }
         }
 
         @Override
@@ -80,7 +84,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        if (AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE).length == 0) addNewAccount();
+        if (AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE).length == 0) {
+            addNewAccount();
+            startGcmRegistration();
+        }
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
@@ -89,7 +96,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         EventBus.getDefault().register(this);
         Intent intent = new Intent(this, ServerSync.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        startService(new Intent(this, RegistrationIntentService.class));
     }
 
     @Override
@@ -105,8 +111,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
-        if (Helper.getAllUnfinishedAlarmsSorted().size() > 0) updateMarkers();
-        else if (googleMap != null) googleMap.clear();
+        updateMarkers();
+        if (googleMap != null) googleMap.clear();
         // Remove notifications from notification panel
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -121,8 +127,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Bundle bnd = future.getResult();
                     Log.w(TAG, "Account was created");
                     Log.d(TAG, "AddNewAccount Bundle is " + bnd);
-                    // do initial polling of alarms
-                    mServerSync.poll();
+                    // update our gcm reg id
+                    neededToCreateAccount = true;
+                    startGcmRegistration();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -130,6 +137,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }, null);
+    }
+
+    private void startGcmRegistration() {
+        startService(new Intent(this, RegistrationIntentService.class));
     }
 
     @Override
@@ -166,8 +177,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        if (Helper.getAllUnfinishedAlarmsSorted().size() == 0) return; // no alarms in queue. don't build markers
-
         /* TODO: Find out how to set the map zoom before/while the map loads */
         googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -180,6 +189,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void updateMarkers() {
         Log.w(TAG, "updating markers");
+        if (Helper.getAllUnfinishedAlarmsSorted().size() == 0) return; // no alarms in queue. don't build markers
         if (googleMap != null) googleMap.clear();
         new AsyncTask<Void, Void, List<MarkerOptions>>() {
             LatLngBounds.Builder builder;

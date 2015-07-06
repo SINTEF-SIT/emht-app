@@ -19,4 +19,5 @@ public class Constants {
     public static final String pref_key_SENT_TOKEN_TO_SERVER = "TOKEN_SENT_TO_SERVER";
     public static final String intent_name_REGISTRATION_COMPLETE = "REGISTRATION_COMPLETE";
     public static final String pref_key_GCM_TOKEN = "GCM_TOKEN";
+    public static final String PROVIDER_AUTHORITIES = "sintef.android.emht.provider";
 }

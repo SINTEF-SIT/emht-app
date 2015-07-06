@@ -192,13 +192,11 @@
                 <RadioButton android:id="@+id/radioAssessmentQuestion1Yes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/yes"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/yes"/>
                 <RadioButton android:id="@+id/radioAssessmentQuestion1No"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/no"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/no"/>
             </RadioGroup>
         </RelativeLayout>
 
@@ -219,13 +217,11 @@
                 <RadioButton android:id="@+id/radioAssessmentQuestion2Yes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/yes"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/yes"/>
                 <RadioButton android:id="@+id/radioAssessmentQuestion2No"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/no"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/no"/>
             </RadioGroup>
         </RelativeLayout>
 
@@ -246,13 +242,11 @@
                 <RadioButton android:id="@+id/radioAssessmentQuestion3Yes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/yes"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/yes"/>
                 <RadioButton android:id="@+id/radioAssessmentQuestion3No"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/no"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/no"/>
             </RadioGroup>
         </RelativeLayout>
 
@@ -273,13 +267,11 @@
                 <RadioButton android:id="@+id/radioAssessmentQuestion4Yes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/yes"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/yes"/>
                 <RadioButton android:id="@+id/radioAssessmentQuestion4No"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/no"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/no"/>
             </RadioGroup>
         </RelativeLayout>
 
@@ -301,13 +293,11 @@
                 <RadioButton android:id="@+id/radioAssessmentQuestion5Yes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/yes"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/yes"/>
                 <RadioButton android:id="@+id/radioAssessmentQuestion5No"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/no"
-                    android:onClick="onRadioButtonClicked"/>
+                    android:text="@string/no"/>
             </RadioGroup>
         </RelativeLayout>
 

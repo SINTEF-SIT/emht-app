@@ -11,10 +11,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <!-- Authenticator and ServerSync-->
+    <!-- Authenticator, ServerSync and SyncAdapter -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
 
     <!-- GCM -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -68,9 +70,9 @@
             android:windowSoftInputMode="stateHidden"/>
 
         <!-- Sugar ORM -->
-        <meta-data android:name="DATABASE" android:value="emht2.db" />
-        <meta-data android:name="VERSION" android:value="20" />
-        <meta-data android:name="QUERY_LOG" android:value="false" />
+        <meta-data android:name="DATABASE" android:value="dev.db" />
+        <meta-data android:name="VERSION" android:value="40" />
+        <meta-data android:name="QUERY_LOG" android:value="true" />
         <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="sintef.android.emht.models" />
 
         <!-- Google Maps API Key -->
@@ -101,5 +103,24 @@
             </intent-filter>
         </service>
         <service android:name=".sync.RegistrationIntentService" android:exported="false"/>
+
+        <!-- Content Provider -->
+        <provider
+            android:name=".sync.EMHTContentProvider"
+            android:authorities="sintef.android.emht.provider"
+            android:exported="false"
+            android:syncable="true"/>
+
+        <!-- Sync service -->
+        <service
+            android:name=".sync.SyncService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_adapter" />
+        </service>
     </application>
 </manifest>

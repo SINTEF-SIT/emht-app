@@ -66,7 +66,7 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
     private String authTokenType;
     private String authToken;
     private int accountId;
-//    private Timer alarmPollTimer;
+    //    private Timer alarmPollTimer;
     private Timer sensorPollTimer;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -75,6 +75,7 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
     private BoundServiceListener mListener;
     private int googleApiErrorCode = 0;
     private SharedPreferences sharedPreferences;
+    private Object authTokenLock = new Object();
 
     @Override
     public void onCreate() {
@@ -88,13 +89,13 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
         mAccountManager.addOnAccountsUpdatedListener(this, null, false);
         buildGoogleApiClient();
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         authTokenType = Constants.AUTH_TOKEN_TYPE;
         if (mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE).length > 0) {
             account = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE)[Constants.ACCOUNT_INDEX];
+            updateGcmRegIdIfNeeded();
             startSync();
         }
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        updateGcmRegIdIfNeeded();
 
     }
 
@@ -104,10 +105,10 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
     }
 
 
-    private void updateGcmRegIdIfNeeded() {
+    public void updateGcmRegIdIfNeeded() {
 
         //if (!sharedPreferences.getBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, false)) {
-            sendRegistrationIdToBackend(sharedPreferences.getString(Constants.pref_key_GCM_TOKEN, "NO_KEY"));
+        sendRegistrationIdToBackend(sharedPreferences.getString(Constants.pref_key_GCM_TOKEN, "NO_KEY"));
         //}
 
     }
@@ -321,6 +322,8 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
 
                     for (int i = 0; i < alarms.length(); i++) {
                         JSONObject alarm = alarms.getJSONObject(i);
+                        /* skip alarm if it's marked as finished */
+                        if (alarm.getBoolean("finished")) continue;
                         /* add alarm to db if it does not exist */
                         if (Alarm.find(Alarm.class, "alarm_id = ?", Long.toString(alarm.getLong("id"))).size() == 0) {
                             Alarm alarmObj = objectMapper.readValue(alarm.toString(), Alarm.class);
@@ -374,18 +377,18 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
      * @param authTokenType
      */
     private void getExistingAccountAuthToken(Account account, String authTokenType) {
-        //final AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(account, authTokenType, null, this, null, null);
         final AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(account, authTokenType, null, true, null, null);
-
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Bundle bnd = future.getResult();
-                    authToken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
-                    Log.d("udinic", "GetToken Bundle is " + bnd);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                synchronized (authTokenLock) {
+                    try {
+                        Bundle bnd = future.getResult();
+                        authToken = bnd.getString(AccountManager.KEY_AUTHTOKEN);
+                        Log.d("udinic", "GetToken Bundle is " + bnd);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }).start();
@@ -533,18 +536,20 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
             protected Boolean doInBackground(Void... params) {
                 try {
                     getExistingAccountAuthToken(account, authTokenType);
-                    URL url = new URL(Constants.SERVER_URL + "/alarm/" + Long.toString(alarmId) + "/finish");
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoOutput(true);
-                    connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("Cookie", authToken);
-                    connection.connect();
-                    if (connection.getResponseCode() != 200) {
-                        invalidateAuthToken(account, authTokenType);
-                        return false;
+                    synchronized (authTokenLock) {
+                        URL url = new URL(Constants.SERVER_URL + "/alarm/" + Long.toString(alarmId) + "/finish");
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setDoOutput(true);
+                        connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
+                        connection.setRequestMethod("POST");
+                        connection.setRequestProperty("Cookie", authToken);
+                        connection.connect();
+                        if (connection.getResponseCode() != 200) {
+                            invalidateAuthToken(account, authTokenType);
+                            return false;
+                        }
+                        return true;
                     }
-                    return true;
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (ProtocolException e) {
@@ -566,20 +571,23 @@ public class ServerSync extends Service implements GoogleApiClient.ConnectionCal
             protected Void doInBackground(Void... params) {
                 try {
                     getExistingAccountAuthToken(account, authTokenType);
-                    URL url = new URL(Constants.SERVER_URL + "/attendants/setGcmRegId");
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoOutput(true);
-                    connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("Cookie", authToken);
-                    new DataOutputStream(connection.getOutputStream()).writeBytes(new JSONObject(parameters).toString());
-                    //connection.connect();
-                    Log.w(TAG, "regid response code: " + connection.getResponseCode());
-                    if (connection.getResponseCode() != 200) {
-                        invalidateAuthToken(account, authTokenType);
-                        sendRegistrationIdToBackend(token);
+                    synchronized (authTokenLock) {
+                        URL url = new URL(Constants.SERVER_URL + "/attendants/setGcmRegId");
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setDoOutput(true);
+                        connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
+                        connection.setRequestMethod("POST");
+                        Log.w(TAG, "regid authtoken: " + authToken);
+                        connection.setRequestProperty("Cookie", authToken);
+                        new DataOutputStream(connection.getOutputStream()).writeBytes(new JSONObject(parameters).toString());
+                        //connection.connect();
+                        Log.w(TAG, "regid response code: " + connection.getResponseCode());
+                        if (connection.getResponseCode() != 200) {
+                            invalidateAuthToken(account, authTokenType);
+                            sendRegistrationIdToBackend(token);
+                        }
+                        sharedPreferences.edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, true).apply();
                     }
-                    sharedPreferences.edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, true).apply();
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (ProtocolException e) {
