@@ -71,7 +71,7 @@
         <meta-data android:name="DATABASE" android:value="emht2.db" />
         <meta-data android:name="VERSION" android:value="20" />
         <meta-data android:name="QUERY_LOG" android:value="false" />
-        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="sintef.android" />
+        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="sintef.android.emht.models" />
 
         <!-- Google Maps API Key -->
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="secret"/>

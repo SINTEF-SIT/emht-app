@@ -121,6 +121,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Bundle bnd = future.getResult();
                     Log.w(TAG, "Account was created");
                     Log.d(TAG, "AddNewAccount Bundle is " + bnd);
+                    // do initial polling of alarms
+                    mServerSync.poll();
 
                 } catch (Exception e) {
                     e.printStackTrace();

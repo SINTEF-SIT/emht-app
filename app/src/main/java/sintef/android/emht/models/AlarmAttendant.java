@@ -18,6 +18,7 @@ public class AlarmAttendant extends SugarRecord<AlarmAttendant> implements Seria
     private Long alarmAttendantId;
     private String username;
     private int role;
+    private String gcmRegId;
 
     public AlarmAttendant() {}
 
@@ -44,5 +45,13 @@ public class AlarmAttendant extends SugarRecord<AlarmAttendant> implements Seria
 
     public void setRole(int role) {
         this.role = role;
+    }
+
+    public String getGcmRegId() {
+        return gcmRegId;
+    }
+
+    public void setGcmRegId(String gcmRegId) {
+        this.gcmRegId = gcmRegId;
     }
 }
