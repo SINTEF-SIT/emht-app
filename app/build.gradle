@@ -37,5 +37,4 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.0.0'
     compile 'org.achartengine:achartengine:1.2.0'
     compile 'com.google.maps.android:android-maps-utils:0.3+'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
 }

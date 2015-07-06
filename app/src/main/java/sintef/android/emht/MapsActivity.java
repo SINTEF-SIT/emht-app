@@ -86,7 +86,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE).length == 0) {
             addNewAccount();
-            startGcmRegistration();
         }
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()

@@ -39,11 +39,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private final AccountManager mAccountManager;
     private ObjectMapper objectMapper;
     private final String TAG = this.getClass().getSimpleName();
+    private RestAPIClient restAPIClient;
 
     public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         mAccountManager = AccountManager.get(context);
         objectMapper = new ObjectMapper();
+        restAPIClient = new RestAPIClient();
     }
 
     @Override
@@ -51,31 +53,19 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.w(TAG, "onPerformSync");
         List<Alarm> alarms = Alarm.find(Alarm.class, "finished = ?", "1");
         try {
-            String authToken = mAccountManager.blockingGetAuthToken(account, Constants.ACCOUNT_TYPE, true);
+            restAPIClient.setAuthToken(mAccountManager.blockingGetAuthToken(account, Constants.ACCOUNT_TYPE, true));
             for (Alarm alarm : alarms) {
-
-                URL url = new URL(Constants.SERVER_URL + "/alarm/saveAndFollowup");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoOutput(true);
-                connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Cookie", authToken);
-
                 /* Visibility and filters required to remove Sugar ORM fields from models */
                 objectMapper.setVisibility(JsonMethod.ALL, JsonAutoDetect.Visibility.NONE);
                 objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
                 objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
                 SimpleBeanPropertyFilter sugarFilter = SimpleBeanPropertyFilter.serializeAllExcept("tableName");
                 FilterProvider filters = new SimpleFilterProvider().addFilter("sugarFilter", sugarFilter);
-                objectMapper.writer(filters).writeValue(new DataOutputStream(connection.getOutputStream()), alarm);
+                String json = objectMapper.writer(filters).writeValueAsString(alarm);
+                Log.w(TAG, "json upstream: " + json);
 
-                url = new URL(Constants.SERVER_URL + "/alarm/" + Long.toString(alarm.getAlarmId()) + "/finish");
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setDoOutput(true);
-                connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Cookie", authToken);
-                connection.connect();
+                restAPIClient.post("/alarm/saveAndFollowup", json);
+                restAPIClient.post("/alarm/" + Long.toString(alarm.getAlarmId()) + "/finish", null);
 
                 alarm.delete();
 
