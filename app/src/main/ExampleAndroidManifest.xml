@@ -65,6 +65,14 @@
         <!-- ServerSync -->
         <service android:name=".sync.ServerSync"/>
 
+        <!-- NetworkChangeReceiver -->
+        <receiver android:name=".sync.NetworkChangeReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+
+
         <!-- Dashboard -->
         <activity android:name=".DashboardActivity"
             android:windowSoftInputMode="stateHidden"/>

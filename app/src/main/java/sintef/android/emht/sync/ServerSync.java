@@ -6,11 +6,13 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.OnAccountsUpdateListener;
 import android.app.Service;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.location.Location;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
@@ -37,8 +39,9 @@ import java.util.TimerTask;
 
 import de.greenrobot.event.EventBus;
 import sintef.android.emht.account.BoundServiceListener;
+import sintef.android.emht.events.NetworkChangeEvent;
 import sintef.android.emht.events.NewGcmAlarmEvent;
-import sintef.android.emht.events.NewSyncEvent;
+import sintef.android.emht.events.SyncEvent;
 import sintef.android.emht.models.Patient;
 import sintef.android.emht.models.SensorData;
 import sintef.android.emht.utils.Constants;
@@ -72,6 +75,7 @@ public class ServerSync extends Service implements
     private SharedPreferences sharedPreferences;
     private static final Object authTokenLock = new Object();
     private RestAPIClient restAPIClient;
+    private boolean hasNetworkConnection;
 
     @Override
     public void onCreate() {
@@ -83,15 +87,15 @@ public class ServerSync extends Service implements
         objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
         mAccountManager = AccountManager.get(getApplicationContext());
         mAccountManager.addOnAccountsUpdatedListener(this, null, false);
-        buildGoogleApiClient();
         restAPIClient = new RestAPIClient();
-
+        hasNetworkConnection = Helper.isConnected(this);
+        buildGoogleApiClient();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         authTokenType = Constants.AUTH_TOKEN_TYPE;
 
         if (mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE).length > 0) {
             account = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE)[Constants.ACCOUNT_INDEX];
-            startSync();
+            if (hasNetworkConnection) startSync();
         }
 
     }
@@ -141,8 +145,8 @@ public class ServerSync extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.w(TAG, "location changed");
         if (!Helper.isBetterLocation(location, currentBestLocation)) {
+            Log.w(TAG, "location changed");
             currentBestLocation = location;
             sendLocationData(location);
         }
@@ -177,7 +181,16 @@ public class ServerSync extends Service implements
     }
 
     @SuppressWarnings("unused")
-    public void onEvent(NewSyncEvent newSyncEvent) {
+    public void onEvent(NetworkChangeEvent networkChangeEvent) {
+        Log.w(TAG, "event networkchangeevent");
+        if (this.hasNetworkConnection == networkChangeEvent.isConnected()) return;
+        this.hasNetworkConnection = networkChangeEvent.isConnected();
+        if (hasNetworkConnection && !mGoogleApiClient.isConnected()) mGoogleApiClient.connect();
+        else if (!hasNetworkConnection && mGoogleApiClient.isConnected()) mGoogleApiClient.disconnect();
+    }
+
+    @SuppressWarnings("unused")
+    public void onEvent(SyncEvent newSyncEvent) {
         startSyncRequest();
     }
 
@@ -219,6 +232,7 @@ public class ServerSync extends Service implements
     public void stopSensorPolling() { if (sensorPollTimer != null) sensorPollTimer.cancel(); }
 
     public void updateSensors(long patientId) {
+        if (!hasNetworkConnection) return;
         Log.w(TAG, "polling server for sensor datas");
         new AsyncTask<Long, Void, Void>() {
             String json = null;

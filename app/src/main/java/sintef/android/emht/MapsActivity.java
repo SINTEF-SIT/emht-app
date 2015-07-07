@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
-import sintef.android.emht.events.NewSyncEvent;
+import sintef.android.emht.events.SyncEvent;
 import sintef.android.emht.sync.RegistrationIntentService;
 import sintef.android.emht.sync.ServerSync;
 import sintef.android.emht.events.NewAlarmEvent;
@@ -84,7 +84,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             addNewAccount();
         } else {
             startGcmRegistration();
-            EventBus.getDefault().post(new NewSyncEvent());
+            EventBus.getDefault().post(new SyncEvent());
         }
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
@@ -127,7 +127,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.d(TAG, "AddNewAccount Bundle is " + bnd);
                     // update our gcm reg id
                     startGcmRegistration();
-                    EventBus.getDefault().post(new NewSyncEvent());
+                    EventBus.getDefault().post(new SyncEvent());
 
                 } catch (Exception e) {
                     e.printStackTrace();

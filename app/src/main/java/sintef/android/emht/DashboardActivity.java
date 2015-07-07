@@ -1,16 +1,12 @@
 package sintef.android.emht;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SyncRequest;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
@@ -29,7 +25,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import de.greenrobot.event.EventBus;
 import sintef.android.emht.account.BoundServiceListener;
-import sintef.android.emht.events.NewSyncEvent;
+import sintef.android.emht.events.SyncEvent;
 import sintef.android.emht.sync.ServerSync;
 import sintef.android.emht.fragments.ActionsFragment;
 import sintef.android.emht.fragments.AssessmentFragment;
@@ -39,7 +35,6 @@ import sintef.android.emht.fragments.RegistrationFragment;
 import sintef.android.emht.models.Alarm;
 import sintef.android.emht.models.Assessment;
 import sintef.android.emht.models.NMI;
-import sintef.android.emht.utils.Constants;
 
 /**
  * Created by iver on 10/06/15.
@@ -286,7 +281,7 @@ public class DashboardActivity extends FragmentActivity {
         alarm.setFieldAssessment(fieldAssessment);
         alarm.save();
 
-        EventBus.getDefault().post(new NewSyncEvent());
+        EventBus.getDefault().post(new SyncEvent());
 
         alarm.setFinished(true);
         alarm.setActive(false);

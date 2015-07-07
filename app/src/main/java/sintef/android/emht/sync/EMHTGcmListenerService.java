@@ -2,11 +2,6 @@ package sintef.android.emht.sync;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.ServiceConnection;
-import android.content.SyncRequest;
-import android.os.IBinder;
 import android.support.v4.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
@@ -19,8 +14,7 @@ import com.google.android.gms.gcm.GcmListenerService;
 import de.greenrobot.event.EventBus;
 import sintef.android.emht.MapsActivity;
 import sintef.android.emht.R;
-import sintef.android.emht.events.NewGcmAlarmEvent;
-import sintef.android.emht.events.NewSyncEvent;
+import sintef.android.emht.events.SyncEvent;
 import sintef.android.emht.utils.Constants;
 
 /**
@@ -37,7 +31,7 @@ public class EMHTGcmListenerService extends GcmListenerService {
         switch (message) {
             case (Constants.GCM_NEW_ALARM):
 //                EventBus.getDefault().post(new NewGcmAlarmEvent());
-                EventBus.getDefault().post(new NewSyncEvent());
+                EventBus.getDefault().post(new SyncEvent());
                 buildNewAlarmNotification();
         }
     }

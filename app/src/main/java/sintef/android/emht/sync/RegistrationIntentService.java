@@ -1,28 +1,18 @@
 package sintef.android.emht.sync;
 
-import android.accounts.AccountManager;
-import android.app.DownloadManager;
 import android.app.IntentService;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.google.android.gms.appdatasearch.GetRecentContextCall;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
-import com.google.android.gms.maps.GoogleMap;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import de.greenrobot.event.EventBus;
 import sintef.android.emht.R;
-import sintef.android.emht.events.NewSyncEvent;
+import sintef.android.emht.events.SyncEvent;
 import sintef.android.emht.utils.Constants;
 
 /**
@@ -55,7 +45,7 @@ public class RegistrationIntentService extends IntentService {
                 sharedPreferences.edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, false).apply();
                 sharedPreferences.edit().remove(Constants.pref_key_GCM_TOKEN).apply();
                 sharedPreferences.edit().putString(Constants.pref_key_GCM_TOKEN, token).apply();
-                EventBus.getDefault().post(new NewSyncEvent());
+                EventBus.getDefault().post(new SyncEvent());
 
             }
         } catch (Exception e) {

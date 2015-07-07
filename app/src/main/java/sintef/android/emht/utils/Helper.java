@@ -1,6 +1,9 @@
 package sintef.android.emht.utils;
 
+import android.content.Context;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -95,5 +98,14 @@ public class Helper {
             return provider2 == null;
         }
         return provider1.equals(provider2);
+    }
+
+    public static boolean isConnected(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null &&
+                activeNetwork.isConnected();
     }
 }
