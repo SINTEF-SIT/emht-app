@@ -1,10 +1,7 @@
 package sintef.android.emht.sync;
 
 import android.accounts.AuthenticatorException;
-import android.os.AsyncTask;
 import android.util.Log;
-
-import com.google.android.gms.auth.api.Auth;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

@@ -38,11 +38,11 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
+import sintef.android.emht.events.NewAlarmEvent;
 import sintef.android.emht.events.SyncEvent;
+import sintef.android.emht.models.Alarm;
 import sintef.android.emht.sync.RegistrationIntentService;
 import sintef.android.emht.sync.ServerSync;
-import sintef.android.emht.events.NewAlarmEvent;
-import sintef.android.emht.models.Alarm;
 import sintef.android.emht.utils.Constants;
 import sintef.android.emht.utils.Helper;
 

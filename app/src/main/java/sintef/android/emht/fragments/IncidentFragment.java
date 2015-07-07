@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import sintef.android.emht.IncidentActivity;
 import sintef.android.emht.AlarmAdapter;
+import sintef.android.emht.IncidentActivity;
 import sintef.android.emht.R;
 import sintef.android.emht.events.NewAlarmEvent;
 import sintef.android.emht.models.Alarm;

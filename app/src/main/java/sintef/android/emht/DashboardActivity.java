@@ -26,7 +26,6 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import de.greenrobot.event.EventBus;
 import sintef.android.emht.account.BoundServiceListener;
 import sintef.android.emht.events.SyncEvent;
-import sintef.android.emht.sync.ServerSync;
 import sintef.android.emht.fragments.ActionsFragment;
 import sintef.android.emht.fragments.AssessmentFragment;
 import sintef.android.emht.fragments.DrawerFragment;
@@ -35,6 +34,7 @@ import sintef.android.emht.fragments.RegistrationFragment;
 import sintef.android.emht.models.Alarm;
 import sintef.android.emht.models.Assessment;
 import sintef.android.emht.models.NMI;
+import sintef.android.emht.sync.ServerSync;
 
 /**
  * Created by iver on 10/06/15.

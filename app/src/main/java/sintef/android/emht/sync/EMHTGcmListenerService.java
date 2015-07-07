@@ -2,11 +2,11 @@ package sintef.android.emht.sync;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.support.v4.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;

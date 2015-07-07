@@ -1,8 +1,8 @@
 package sintef.android.emht;
 
-import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 /**
