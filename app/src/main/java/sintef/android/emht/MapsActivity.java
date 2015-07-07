@@ -53,10 +53,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private final String TAG = this.getClass().getSimpleName();
     private Map<LatLng, Alarm> markerMap;
-    private String firstAlarmMarkerId;
+    private Marker firstAlarmMarker;
     private ServerSync mServerSync;
     private boolean mBound = false;
     private GoogleMap googleMap;
+    private boolean firstAlarmSet = false;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -109,6 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
+        firstAlarmSet = false;
         updateMarkers();
         if (googleMap != null) googleMap.clear();
         // Remove notifications from notification panel
@@ -151,7 +153,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onInfoWindowClick(final Marker marker) {
                 Log.w(TAG, "onInfoWindowCliecked");
-                if (!marker.getId().equals(firstAlarmMarkerId)) return;
+                Log.w(TAG, "marker id: " + marker.getId());
+                Log.w(TAG, "firstAlarmMarker id: " + firstAlarmMarker.getId());
+                if (!marker.equals(firstAlarmMarker)) return;
                 new android.support.v4.app.DialogFragment() {
                     @Override
                     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -185,10 +189,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void updateMarkers() {
+    private synchronized  void updateMarkers() {
         Log.w(TAG, "updating markers");
         if (Helper.getAllUnfinishedAlarmsSorted().size() == 0) return; // no alarms in queue. don't build markers
-        if (googleMap != null) googleMap.clear();
+        //if (googleMap != null) googleMap.clear();
         new AsyncTask<Void, Void, List<MarkerOptions>>() {
             LatLngBounds.Builder builder;
             @Override
@@ -197,6 +201,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 List<MarkerOptions> markerOptions = new ArrayList<>();
                 int queueNumber = 1;
                 for (Alarm alarm : Helper.getAllUnfinishedAlarmsSorted()) {
+                    if (markerMap.containsKey(alarm)) { firstAlarmSet = true; queueNumber++; continue; }
                     LatLng latLng = findLatLng(alarm);
 
                     // custom markers showing the queue number of the alarm
@@ -227,11 +232,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.w(TAG, "onPostExecute");
                 int queueNumber = 1;
                 for (MarkerOptions marker : markerOptions) {
-                    if (queueNumber == 1) firstAlarmMarkerId = googleMap.addMarker(marker).getId();
+                    if (queueNumber == 1 && !firstAlarmSet) { firstAlarmMarker = googleMap.addMarker(marker); firstAlarmSet = true; }
                     else googleMap.addMarker(marker);
                     queueNumber++;
                 }
-                int padding = 400; // offset from edges of the map in pixels
+                int padding = 400; // offset from edges of the map in pixels TODO: base this on screen size
                 LatLngBounds bounds = builder.build();
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
             }
