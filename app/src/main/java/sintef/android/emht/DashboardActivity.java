@@ -280,16 +280,10 @@ public class DashboardActivity extends FragmentActivity {
         fieldAssessment.save();
         alarm.setFieldAssessment(fieldAssessment);
         alarm.save();
-
-        EventBus.getDefault().post(new SyncEvent());
-
-        alarm.setFinished(true);
         alarm.setActive(false);
+        alarm.setAddToUploadQueue(true);
         alarm.save();
-
-        // send json to some endpoint...
-//        if (mBound) mServerSync.addAlarmToTransmitQueue(alarm);
-//        else Log.w(TAG, "serversync not bound!");
+        EventBus.getDefault().post(new SyncEvent());
     }
 
     private Boolean getRadioGroupAnswer(View view, int yesId, int noId) {

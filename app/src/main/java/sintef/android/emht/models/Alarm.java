@@ -39,6 +39,8 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
     private boolean finished;
     @JsonIgnore
     private boolean active;
+    @JsonIgnore
+    private boolean addToUploadQueue;
 
     /* empty constructor required by sugar */
     public Alarm() {}
@@ -233,5 +235,13 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isAddToUploadQueue() {
+        return addToUploadQueue;
+    }
+
+    public void setAddToUploadQueue(boolean addToUploadQueue) {
+        this.addToUploadQueue = addToUploadQueue;
     }
 }

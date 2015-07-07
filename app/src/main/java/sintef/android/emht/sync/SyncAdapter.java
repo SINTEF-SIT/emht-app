@@ -84,7 +84,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
 
     private void sendAlarms(Account account) throws Exception {
-        List<Alarm> alarms = Alarm.find(Alarm.class, "finished = ?", "1");
+        List<Alarm> alarms = Alarm.find(Alarm.class, "add_to_upload_queue = ?", "1");
         restAPIClient.setAuthToken(mAccountManager.blockingGetAuthToken(account, Constants.AUTH_TOKEN_TYPE, true));
         for (Alarm alarm : alarms) {
                 /* Visibility and filters required to remove Sugar ORM fields from models */
@@ -98,6 +98,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             Log.w(TAG, "posting to saveAndFollowup");
             restAPIClient.post("/alarm/saveAndFollowup", json);
+            alarm.setFinished(true);
+            alarm.save();
             Log.w(TAG, "posting to finish");
             restAPIClient.post("/alarm/" + Long.toString(alarm.getAlarmId()) + "/finish", null);
 

@@ -30,7 +30,7 @@ public class Helper {
     }
 
     public static List<Alarm> getAllUnfinishedAlarms() {
-        return Alarm.find(Alarm.class, "finished = ?", "0");
+        return Alarm.find(Alarm.class, "add_to_upload_queue = ?", "0");
     }
 
     public static List<Alarm> getAllUnfinishedAndInactiveAlarmsSorted() {
@@ -40,7 +40,7 @@ public class Helper {
     }
 
     public static List<Alarm> getAllUnfinishedAndInactiveAlarms() {
-        return Alarm.find(Alarm.class, "finished = ? and active = ?", "0", "0");
+        return Alarm.find(Alarm.class, "add_to_upload_queue = ? and active = ?", "0", "0");
     }
 
     // from http://developer.android.com/guide/topics/location/strategies.html
