@@ -55,74 +55,84 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.w(TAG, "onPerformSync");
-        sendAlarms(account);
-        updateAlarms();
-        Log.w(TAG, "gcm reg id from syncadapter: " + PreferenceManager.getDefaultSharedPreferences(mContext).getString(Constants.pref_key_GCM_TOKEN, "NO_KEY"));
-        if (!PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, false)) sendGcmRegiId(account);
+        try {
+            Log.w(TAG, "onPerformSync");
+            sendAlarms(account);
+            updateAlarms();
+            Log.w(TAG, "gcm reg id from syncadapter: " + PreferenceManager.getDefaultSharedPreferences(mContext).getString(Constants.pref_key_GCM_TOKEN, "NO_KEY"));
+            if (!PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, false))
+                sendGcmRegiId(account);
+        } catch (AuthenticatorException e) {
+            syncResult.stats.numAuthExceptions++;
+            try {
+                AccountManager.get(mContext).invalidateAuthToken(account.type, AccountManager.get(mContext).blockingGetAuthToken(account, Constants.AUTH_TOKEN_TYPE, true));
+            } catch (OperationCanceledException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (AuthenticatorException e1) {
+                e1.printStackTrace();
+            }
+        } catch (RestAPIClient.ServerErrorException e) {
+            syncResult.stats.numIoExceptions++;
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void sendAlarms(Account account) {
+
+
+    private void sendAlarms(Account account) throws Exception {
         List<Alarm> alarms = Alarm.find(Alarm.class, "finished = ?", "1");
-        try {
-            restAPIClient.setAuthToken(mAccountManager.blockingGetAuthToken(account, Constants.ACCOUNT_TYPE, true));
-            for (Alarm alarm : alarms) {
+        restAPIClient.setAuthToken(mAccountManager.blockingGetAuthToken(account, Constants.AUTH_TOKEN_TYPE, true));
+        for (Alarm alarm : alarms) {
                 /* Visibility and filters required to remove Sugar ORM fields from models */
-                objectMapper.setVisibility(JsonMethod.ALL, JsonAutoDetect.Visibility.NONE);
-                objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
-                objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
-                SimpleBeanPropertyFilter sugarFilter = SimpleBeanPropertyFilter.serializeAllExcept("tableName");
-                FilterProvider filters = new SimpleFilterProvider().addFilter("sugarFilter", sugarFilter);
-                String json = objectMapper.writer(filters).writeValueAsString(alarm);
-                Log.w(TAG, "json upstream: " + json);
+            objectMapper.setVisibility(JsonMethod.ALL, JsonAutoDetect.Visibility.NONE);
+            objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
+            objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+            SimpleBeanPropertyFilter sugarFilter = SimpleBeanPropertyFilter.serializeAllExcept("tableName");
+            FilterProvider filters = new SimpleFilterProvider().addFilter("sugarFilter", sugarFilter);
+            String json = objectMapper.writer(filters).writeValueAsString(alarm);
+            Log.w(TAG, "json upstream: " + json);
 
-                restAPIClient.post("/alarm/saveAndFollowup", json);
-                restAPIClient.post("/alarm/" + Long.toString(alarm.getAlarmId()) + "/finish", null);
+            Log.w(TAG, "posting to saveAndFollowup");
+            restAPIClient.post("/alarm/saveAndFollowup", json);
+            Log.w(TAG, "posting to finish");
+            restAPIClient.post("/alarm/" + Long.toString(alarm.getAlarmId()) + "/finish", null);
 
-                alarm.delete();
-
-            }
-        } catch (OperationCanceledException e1) {
-            e1.printStackTrace();
-        } catch (AuthenticatorException e1) {
-            e1.printStackTrace();
-        } catch (ProtocolException e1) {
-            e1.printStackTrace();
-        } catch (MalformedURLException e1) {
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            e1.printStackTrace();
+            alarm.delete();
         }
     }
 
     public void updateAlarms() {
         Log.w(TAG, "polling server for alarms");
-            String json = null;
-                try {
-                    json = restAPIClient.get("/alarm/assignedToMe");
-                    if (json == null) return;
-                    JSONArray alarms = new JSONObject(json).getJSONArray("alarms");
-                    for (int i = 0; i < alarms.length(); i++) {
-                        JSONObject alarm = alarms.getJSONObject(i);
+        String json = null;
+        try {
+            json = restAPIClient.get("/alarm/assignedToMe");
+            if (json == null) return;
+            JSONArray alarms = new JSONObject(json).getJSONArray("alarms");
+            for (int i = 0; i < alarms.length(); i++) {
+                JSONObject alarm = alarms.getJSONObject(i);
                         /* skip alarm if it's marked as finished */
-                        if (alarm.getBoolean("finished")) continue;
+                if (alarm.getBoolean("finished")) continue;
                         /* add alarm to db if it does not exist */
-                        if (Alarm.find(Alarm.class, "alarm_id = ?", Long.toString(alarm.getLong("id"))).size() == 0) {
-                            Alarm alarmObj = objectMapper.readValue(alarm.toString(), Alarm.class);
-                            alarmObj.getPatient().save();
-                            alarmObj.getCallee().save();
-                            alarmObj.getAssessment().getNmi().save();
-                            alarmObj.getAssessment().save();
-                            alarmObj.getAttendant().save();
-                            alarmObj.getMobileCareTaker().save();
-                            alarmObj.save();
-                            EventBus.getDefault().post(new NewAlarmEvent((alarmObj.getId())));
-                            Log.w(TAG, "added new alarm to db");
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (Alarm.find(Alarm.class, "alarm_id = ?", Long.toString(alarm.getLong("id"))).size() == 0) {
+                    Alarm alarmObj = objectMapper.readValue(alarm.toString(), Alarm.class);
+                    alarmObj.getPatient().save();
+                    alarmObj.getCallee().save();
+                    alarmObj.getAssessment().getNmi().save();
+                    alarmObj.getAssessment().save();
+                    alarmObj.getAttendant().save();
+                    alarmObj.getMobileCareTaker().save();
+                    alarmObj.save();
+                    EventBus.getDefault().post(new NewAlarmEvent((alarmObj.getId())));
+                    Log.w(TAG, "added new alarm to db");
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendGcmRegiId(Account account) {
@@ -130,7 +140,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         final Map<String, String> parameters = new HashMap<>();
         parameters.put("gcmRegId", PreferenceManager.getDefaultSharedPreferences(mContext).getString(Constants.pref_key_GCM_TOKEN, "NO_KEY"));
         try {
-            restAPIClient.setAuthToken(mAccountManager.blockingGetAuthToken(account, Constants.ACCOUNT_TYPE, true));
+            restAPIClient.setAuthToken(mAccountManager.blockingGetAuthToken(account, Constants.AUTH_TOKEN_TYPE, true));
             restAPIClient.post("/attendants/setGcmRegId", new JSONObject(parameters).toString());
             PreferenceManager.getDefaultSharedPreferences(mContext).edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, true).apply();
         } catch (OperationCanceledException e) {
@@ -138,6 +148,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (AuthenticatorException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

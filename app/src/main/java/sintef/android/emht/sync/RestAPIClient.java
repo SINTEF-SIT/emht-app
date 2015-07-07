@@ -29,26 +29,16 @@ public class RestAPIClient {
         this.authToken = authToken;
     }
 
-    public void post(final String endPoint, final String postData) {
-        try {
-            URL url = new URL(Constants.SERVER_URL + endPoint);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(false);
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Cookie", null);
-            if (postData != null) new DataOutputStream(connection.getOutputStream()).writeBytes(postData);
-            exceptionHandler(connection.getResponseCode());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void post(final String endPoint, final String postData) throws Exception {
+        URL url = new URL(Constants.SERVER_URL + endPoint);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setDoOutput(false);
+        connection.setInstanceFollowRedirects(false);
+        connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Cookie", authToken);
+        if (postData != null) new DataOutputStream(connection.getOutputStream()).writeBytes(postData);
+        exceptionHandler(connection.getResponseCode());
     }
 
 
@@ -60,6 +50,7 @@ public class RestAPIClient {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Cookie", authToken);
             connection.setRequestMethod("GET");
+            connection.setInstanceFollowRedirects(false);
             connection.connect();
             exceptionHandler(connection.getResponseCode());
             bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
