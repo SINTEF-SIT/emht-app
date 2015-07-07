@@ -142,7 +142,7 @@ public class ServerSync extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
-        if (!Helper.isBetterLocation(location, currentBestLocation)) {
+        if (Helper.isBetterLocation(location, currentBestLocation)) {
             Log.w(TAG, "location changed");
             currentBestLocation = location;
             sendLocationData(location);
@@ -193,15 +193,21 @@ public class ServerSync extends Service implements
 
     private void startSyncRequest() {
         Account account = AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE)[0];
-        SyncRequest.Builder mBuilder = new SyncRequest.Builder()
-                .setExpedited(true) // prioritize this sync
-                .setSyncAdapter(account, Constants.PROVIDER_AUTHORITIES)
-                .setManual(true)
-                .syncOnce()
-                .setExtras(new Bundle()); // Bundle mandatory to build request
+
+        Bundle syncBundle = new Bundle();
+        syncBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        syncBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+
+//        SyncRequest.Builder mBuilder = new SyncRequest.Builder()
+//                .setExpedited(true) // prioritize this sync
+//                .setSyncAdapter(account, Constants.PROVIDER_AUTHORITIES)
+//                .setManual(true)
+//                .syncOnce()
+//                .setExtras(new Bundle()); // Bundle mandatory to build request
 
         ContentResolver.setSyncAutomatically(account, Constants.PROVIDER_AUTHORITIES, true);
-        ContentResolver.requestSync(mBuilder.build());
+//        ContentResolver.requestSync(mBuilder.build());
+        ContentResolver.requestSync(account, Constants.PROVIDER_AUTHORITIES, syncBundle);
     }
 
     public class LocalBinder extends Binder {
@@ -275,7 +281,7 @@ public class ServerSync extends Service implements
                 try {
                     Bundle bnd = future.getResult();
                     restAPIClient.setAuthToken(bnd.getString(AccountManager.KEY_AUTHTOKEN));
-                    restAPIClient.post("/attendants/setGcmRegId", new JSONObject(parameters).toString());
+                    restAPIClient.post("/location/report", new JSONObject(parameters).toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
