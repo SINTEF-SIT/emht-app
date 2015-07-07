@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
@@ -18,7 +19,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -58,6 +62,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean mBound = false;
     private GoogleMap googleMap;
     private boolean firstAlarmSet = false;
+    private int padding;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -95,6 +100,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         EventBus.getDefault().register(this);
         Intent intent = new Intent(this, ServerSync.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        padding = getMapPadding(this);
     }
 
     @Override
@@ -142,6 +148,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void startGcmRegistration() {
         startService(new Intent(this, RegistrationIntentService.class));
     }
+
+    private static int getMapPadding(Context context)
+    {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+        int width = metrics.widthPixels;
+        int height = metrics.heightPixels;
+
+        int smallest = (width < height) ? width : height;
+
+        return smallest/6; // a sort-of-qualified guess
+    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -236,7 +257,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     else googleMap.addMarker(marker);
                     queueNumber++;
                 }
-                int padding = 400; // offset from edges of the map in pixels TODO: base this on screen size
+
                 LatLngBounds bounds = builder.build();
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
             }
