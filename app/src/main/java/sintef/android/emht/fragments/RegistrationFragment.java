@@ -44,13 +44,15 @@ public class RegistrationFragment extends Fragment{
         calleeName.setText(alarm.getCallee().getName());
         calleeAddress.setText(alarm.getCallee().getAddress());
         calleePhoneNumber.setText(alarm.getCallee().getPhoneNumber());
-        patientName.setText(alarm.getPatient().getName());
-        patientAddress.setText(alarm.getPatient().getAddress());
-        patientPersonalNumber.setText(alarm.getPatient().getPersonalNumber());
-        patientPhoneNumber.setText(alarm.getPatient().getPhoneNumber());
-        patientAge.setText(Integer.toString(alarm.getPatient().getAge()));
-        patientIncidentLocation.setText(alarm.getOccuranceAddress());
-        patientLog.setText(alarm.getPatient().getObs());
+        if (alarm.getPatient() != null) {
+            patientName.setText(alarm.getPatient().getName());
+            patientAddress.setText(alarm.getPatient().getAddress());
+            patientPersonalNumber.setText(alarm.getPatient().getPersonalNumber());
+            patientPhoneNumber.setText(alarm.getPatient().getPhoneNumber());
+            patientAge.setText(Integer.toString(alarm.getPatient().getAge()));
+            patientIncidentLocation.setText(alarm.getOccuranceAddress());
+            patientLog.setText(alarm.getPatient().getObs());
+        }
 
         return registrationView;
     }

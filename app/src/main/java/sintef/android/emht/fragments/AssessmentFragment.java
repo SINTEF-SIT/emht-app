@@ -40,7 +40,7 @@ public class AssessmentFragment extends Fragment {
         if (alarm.getAssessment().isPatientInformationChecked()) ((TextView) assessmentView.findViewById(R.id.assessmentLogPatientInformationCheckedAnswer)).setText(getResources().getString(R.string.yes));
         if (alarm.getAssessment().isSensorsChecked()) ((TextView) assessmentView.findViewById(R.id.assessmentLogSensorsCheckedAnswer)).setText(getResources().getString(R.string.yes));
 
-        ((TextView) assessmentView.findViewById(R.id.cautionLog)).setText(alarm.getPatient().getObs());
+        if (alarm.getPatient() != null && alarm.getPatient().getObs() != null) ((TextView) assessmentView.findViewById(R.id.cautionLog)).setText(alarm.getPatient().getObs());
 
         return assessmentView;
     }

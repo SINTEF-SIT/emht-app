@@ -32,6 +32,7 @@ import java.util.Map;
 import de.greenrobot.event.EventBus;
 import sintef.android.emht.events.NewAlarmEvent;
 import sintef.android.emht.models.Alarm;
+import sintef.android.emht.models.Patient;
 import sintef.android.emht.utils.Constants;
 
 /**
@@ -121,7 +122,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         /* add alarm to db if it does not exist */
                 if (Alarm.find(Alarm.class, "alarm_id = ?", Long.toString(alarm.getLong("id"))).size() == 0) {
                     Alarm alarmObj = objectMapper.readValue(alarm.toString(), Alarm.class);
-                    alarmObj.getPatient().save();
+                    if (alarmObj.getPatient() != null) alarmObj.getPatient().save();
+                    else alarmObj.setPatient(new Patient());
                     alarmObj.getCallee().save();
                     alarmObj.getAssessment().getNmi().save();
                     alarmObj.getAssessment().save();
