@@ -27,7 +27,9 @@ import android.widget.RadioButton;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import de.greenrobot.event.EventBus;
 import sintef.android.emht.account.BoundServiceListener;
+import sintef.android.emht.events.NewSyncEvent;
 import sintef.android.emht.sync.ServerSync;
 import sintef.android.emht.fragments.ActionsFragment;
 import sintef.android.emht.fragments.AssessmentFragment;
@@ -284,16 +286,7 @@ public class DashboardActivity extends FragmentActivity {
         alarm.setFieldAssessment(fieldAssessment);
         alarm.save();
 
-        Account account = AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE)[0];
-        SyncRequest.Builder mBuilder = new SyncRequest.Builder()
-                .setExpedited(true) // prioritize this sync
-                .setSyncAdapter(account, Constants.PROVIDER_AUTHORITIES)
-                .setManual(true)
-                .syncOnce()
-                .setExtras(new Bundle()); // Bundle mandatory to build request
-
-        ContentResolver.setSyncAutomatically(account, Constants.PROVIDER_AUTHORITIES, true);
-        ContentResolver.requestSync(mBuilder.build());
+        EventBus.getDefault().post(new NewSyncEvent());
 
         alarm.setFinished(true);
         alarm.setActive(false);

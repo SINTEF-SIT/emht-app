@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
+import sintef.android.emht.events.NewSyncEvent;
 import sintef.android.emht.sync.RegistrationIntentService;
 import sintef.android.emht.sync.ServerSync;
 import sintef.android.emht.events.NewAlarmEvent;
@@ -56,7 +57,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ServerSync mServerSync;
     private boolean mBound = false;
     private GoogleMap googleMap;
-    private boolean neededToCreateAccount = false;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -67,10 +67,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ServerSync.LocalBinder binder = (ServerSync.LocalBinder) service;
             mServerSync = binder.getService();
             mBound = true;
-            if (neededToCreateAccount) {
-                mServerSync.poll();
-                mServerSync.updateGcmRegIdIfNeeded();
-            }
         }
 
         @Override
@@ -86,6 +82,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE).length == 0) {
             addNewAccount();
+        } else {
+            startGcmRegistration();
+            EventBus.getDefault().post(new NewSyncEvent());
         }
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
@@ -127,8 +126,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.w(TAG, "Account was created");
                     Log.d(TAG, "AddNewAccount Bundle is " + bnd);
                     // update our gcm reg id
-                    neededToCreateAccount = true;
                     startGcmRegistration();
+                    EventBus.getDefault().post(new NewSyncEvent());
 
                 } catch (Exception e) {
                     e.printStackTrace();

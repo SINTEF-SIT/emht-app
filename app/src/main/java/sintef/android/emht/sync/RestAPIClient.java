@@ -55,7 +55,7 @@ public class RestAPIClient {
     }
 
 
-    private String get(String endPoint) throws Exception {
+    public String get(String endPoint) throws Exception {
         Log.w(TAG, "trying to read url");
         BufferedReader bufferedReader = null;
         try {

@@ -20,6 +20,7 @@ import de.greenrobot.event.EventBus;
 import sintef.android.emht.MapsActivity;
 import sintef.android.emht.R;
 import sintef.android.emht.events.NewGcmAlarmEvent;
+import sintef.android.emht.events.NewSyncEvent;
 import sintef.android.emht.utils.Constants;
 
 /**
@@ -35,7 +36,8 @@ public class EMHTGcmListenerService extends GcmListenerService {
         Log.w(TAG, "GCM recieved message: " + message);
         switch (message) {
             case (Constants.GCM_NEW_ALARM):
-                EventBus.getDefault().post(new NewGcmAlarmEvent());
+//                EventBus.getDefault().post(new NewGcmAlarmEvent());
+                EventBus.getDefault().post(new NewSyncEvent());
                 buildNewAlarmNotification();
         }
     }

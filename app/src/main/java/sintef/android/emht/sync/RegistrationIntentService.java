@@ -20,7 +20,9 @@ import com.google.android.gms.maps.GoogleMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.greenrobot.event.EventBus;
 import sintef.android.emht.R;
+import sintef.android.emht.events.NewSyncEvent;
 import sintef.android.emht.utils.Constants;
 
 /**
@@ -46,14 +48,18 @@ public class RegistrationIntentService extends IntentService {
                 // Initially a network call, to retrieve the token, subsequent calls are local.
                 InstanceID instanceID = InstanceID.getInstance(this);
                 String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-                Log.i(TAG, "GCM Registration Token: " + token);
+                Log.w(TAG, "GCM Registration Token: " + token);
+
+                if (sharedPreferences.getString(Constants.pref_key_GCM_TOKEN, "").equals(token)) return;
+
+                sharedPreferences.edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, false).apply();
                 sharedPreferences.edit().remove(Constants.pref_key_GCM_TOKEN).apply();
                 sharedPreferences.edit().putString(Constants.pref_key_GCM_TOKEN, token).apply();
+                EventBus.getDefault().post(new NewSyncEvent());
 
-                sharedPreferences.edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, true).apply();
             }
         } catch (Exception e) {
-            Log.d(TAG, "Failed to complete token refresh", e);
+            Log.w(TAG, "Failed to complete token refresh", e);
             sharedPreferences.edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, false).apply();
         }
         // Notify UI that registration has completed, so the progress indicator can be hidden.
