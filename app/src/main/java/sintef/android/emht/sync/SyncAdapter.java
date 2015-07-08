@@ -144,7 +144,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private void sendGcmRegiId(Account account) {
         Log.w(TAG, "syncadapter sending gcm reg id");
         final Map<String, String> parameters = new HashMap<>();
-        parameters.put("gcmRegId", PreferenceManager.getDefaultSharedPreferences(mContext).getString(Constants.pref_key_GCM_TOKEN, "NO_KEY"));
+        String regId = PreferenceManager.getDefaultSharedPreferences(mContext).getString(Constants.pref_key_GCM_TOKEN, null);
+        if (regId == null) return;
+        parameters.put("gcmRegId", regId);
         try {
             restAPIClient.setAuthToken(mAccountManager.blockingGetAuthToken(account, Constants.AUTH_TOKEN_TYPE, true));
             restAPIClient.post("/attendants/setGcmRegId", new JSONObject(parameters).toString());
