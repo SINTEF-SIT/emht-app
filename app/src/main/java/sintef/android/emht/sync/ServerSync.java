@@ -84,7 +84,6 @@ public class ServerSync extends Service implements
         objectMapper.setVisibility(JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY);
         mAccountManager = AccountManager.get(getApplicationContext());
         mAccountManager.addOnAccountsUpdatedListener(this, null, false);
-        restAPIClient = new RestAPIClient();
         hasNetworkConnection = Helper.isConnected(this);
         buildGoogleApiClient();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -92,6 +91,7 @@ public class ServerSync extends Service implements
 
         if (mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE).length > 0) {
             account = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE)[Constants.ACCOUNT_INDEX];
+            restAPIClient = new RestAPIClient(mAccountManager.getUserData(account, Constants.pref_key_SERVER_URL));
             if (hasNetworkConnection) startSync();
         }
 

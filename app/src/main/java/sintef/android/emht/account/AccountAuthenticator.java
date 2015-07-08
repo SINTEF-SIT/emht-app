@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import sintef.android.emht.utils.Constants;
+
 /**
  * Created by iver on 08/06/15.
  */
@@ -58,7 +60,8 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
             final String password = mAccountManager.getPassword(account);
             if (password != null) {
                 try {
-                    authToken = mAccountGeneral.mServerAuthenticate.userSignIn(account.name, password, authTokenType);
+                    String serverUrl = mAccountManager.getUserData(account, Constants.pref_key_SERVER_URL);
+                    authToken = mAccountGeneral.mServerAuthenticate.userSignIn(account.name, password, authTokenType, serverUrl);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -51,11 +51,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         this.mContext = context;
         mAccountManager = AccountManager.get(context);
         objectMapper = new ObjectMapper();
-        restAPIClient = new RestAPIClient();
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        if (restAPIClient == null) restAPIClient = new RestAPIClient(mAccountManager.getUserData(account, Constants.pref_key_SERVER_URL));
         try {
             Log.w(TAG, "onPerformSync");
             sendAlarms(account);

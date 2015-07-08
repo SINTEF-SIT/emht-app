@@ -1,6 +1,8 @@
 package sintef.android.emht.sync;
 
 import android.accounts.AuthenticatorException;
+import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -24,8 +26,10 @@ public class RestAPIClient {
 
     private String authToken;
     private final String TAG = this.getClass().getSimpleName();
+    private String serverUrl;
 
-    public RestAPIClient() {
+    public RestAPIClient(String serverUrl) {
+        this.serverUrl = serverUrl;
     }
 
     public synchronized void setAuthToken(String authToken) {
@@ -42,7 +46,7 @@ public class RestAPIClient {
     }
 
     public void post(final String endPoint, final String postData) throws Exception {
-        URL url = new URL(Constants.SERVER_URL + endPoint);
+        URL url = new URL(serverUrl + endPoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(false);
         connection.setInstanceFollowRedirects(false);
@@ -66,7 +70,7 @@ public class RestAPIClient {
         Log.w(TAG, "trying to read url");
         BufferedReader bufferedReader = null;
         try {
-            URL url = new URL(Constants.SERVER_URL + endPoint);
+            URL url = new URL(serverUrl + endPoint);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Cookie", authToken);
             connection.setRequestMethod("GET");

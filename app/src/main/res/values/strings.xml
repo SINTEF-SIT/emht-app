@@ -11,14 +11,21 @@
     <string name="account_pref_debug_summary">Connecting to development server instead of production server</string>
     <string name="account_pref_log_title">Debug Logs</string>
     <string name="account_pref_log_summary">Show debug logs on LogCat</string>
+    <string name="account_pref_server_url">Server URL</string>
+    <string name="account_pref_server_url_summary">The URL of the server</string>
+    <string name="account_pref_dev_server_url">Development server URL</string>
+    <string name="account_pref_dev_server_summary">The URL of the development server</string>
 
     <!-- login -->
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
+    <string name="prompt_server_url">Server URL</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_incorrect_login">This username and/or password is incorrect</string>
+    <string name="error_server_unavailable">The server did not respond</string>
     <string name="error_field_required">This field is required</string>
+    <string name="default_server_url">http://129.241.105.197:9000</string>
     <string name="login_url_dev">http://10.218.86.177:9000/login</string>
     <string name="login_message">Please login to continue.</string>
 

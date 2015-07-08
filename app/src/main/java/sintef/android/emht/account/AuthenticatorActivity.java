@@ -7,11 +7,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import sintef.android.emht.R;
+import sintef.android.emht.utils.Constants;
 
 /**
  * Created by iver on 09/06/15.
@@ -61,6 +63,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         final String userName = ((TextView) findViewById(R.id.username)).getText().toString();
         final String userPass = ((TextView) findViewById(R.id.password)).getText().toString();
 
+        String userServerUrl = ((TextView) findViewById(R.id.server_url)).getText().toString();
+        final String serverUrl = userServerUrl;
+
         progressDialog.setCancelable(false);
         progressDialog.setIndeterminate(true);
         progressDialog.setTitle("Logging in...");
@@ -77,16 +82,18 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
                 try {
                     Log.w(TAG, "trying to get authtoken");
-                    authToken = AccountGeneral.getInstance(getApplicationContext()).mServerAuthenticate.userSignIn(userName, userPass, null);
+                    authToken = AccountGeneral.getInstance(getApplicationContext()).mServerAuthenticate.userSignIn(userName, userPass, null, serverUrl);
                     Log.w(TAG, authToken);
+
+                    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(Constants.pref_key_SERVER_URL, serverUrl);
 
                     data.putString(AccountManager.KEY_ACCOUNT_NAME, userName);
                     data.putString(AccountManager.KEY_ACCOUNT_TYPE, "sintef.android.emht");
                     data.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+                    data.putString(Constants.pref_key_SERVER_URL, serverUrl);
                     data.putString(PARAM_USER_PASS, userPass);
 
                 } catch (Exception e) {
-                    if (e == null) Log.w(TAG, "exception is null");
                     e.printStackTrace();
                     Log.w(TAG, e.getMessage());
                     data.putString(KEY_ERROR_MESSAGE, e.getMessage());
@@ -116,6 +123,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
         String accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         String accountPassword = intent.getStringExtra(PARAM_USER_PASS);
+        String serverUrl = intent.getStringExtra(Constants.pref_key_SERVER_URL);
         final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
 
         if (getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)) {
@@ -127,6 +135,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             // (Not setting the auth token will cause another call to the server to authenticate the user)
             mAccountManager.addAccountExplicitly(account, accountPassword, null);
             mAccountManager.setAuthToken(account, authtokenType, authtoken);
+            mAccountManager.setUserData(account, Constants.pref_key_SERVER_URL, serverUrl);
         } else {
             Log.d(TAG,"finishLogin > setPassword");
             mAccountManager.setPassword(account, accountPassword);
