@@ -23,6 +23,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -293,7 +294,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void run() {
                 updateMarkers();
+                ((TextView) findViewById(R.id.number_of_alarms)).setText(Integer.toString(Helper.getAllUnfinishedAlarms().size()));
             }
         });
+
     }
 }

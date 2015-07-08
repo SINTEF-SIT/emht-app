@@ -123,7 +123,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 if (Alarm.find(Alarm.class, "alarm_id = ?", Long.toString(alarm.getLong("id"))).size() == 0) {
                     Alarm alarmObj = objectMapper.readValue(alarm.toString(), Alarm.class);
                     if (alarmObj.getPatient() != null) alarmObj.getPatient().save();
-                    else alarmObj.setPatient(new Patient());
                     alarmObj.getCallee().save();
                     alarmObj.getFieldAssessment().getNmi().save();
                     alarmObj.getFieldAssessment().save();

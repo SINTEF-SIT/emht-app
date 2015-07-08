@@ -4,24 +4,45 @@
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/map_header"
-        android:textSize="20dp"
-        android:textStyle="bold"
+        android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
-        android:layout_centerInParent="true"
-        android:paddingLeft="20dp"/>
+        android:id="@+id/map_header_app_name"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/map_header"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:paddingLeft="20dp"/>
+    </LinearLayout>
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/number_of_alarms"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@+id/map_header_app_name"
         android:layout_alignParentRight="true"
-        android:id="@+id/number_of_alarms"
-        android:layout_centerInParent="true"
-        android:paddingRight="20dp"
-        android:textSize="15dp"/>
+        android:gravity="center|right"
+        android:paddingRight="20dp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/number_of_alarms"
+                android:id="@+id/number_of_alarms_text"
+                android:textSize="15dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:paddingLeft="5dp"
+                android:id="@+id/number_of_alarms"/>
+
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>
