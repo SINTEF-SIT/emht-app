@@ -125,6 +125,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     if (alarmObj.getPatient() != null) alarmObj.getPatient().save();
                     else alarmObj.setPatient(new Patient());
                     alarmObj.getCallee().save();
+                    alarmObj.getFieldAssessment().getNmi().save();
+                    alarmObj.getFieldAssessment().save();
                     alarmObj.getAssessment().getNmi().save();
                     alarmObj.getAssessment().save();
                     alarmObj.getAttendant().save();

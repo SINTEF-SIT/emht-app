@@ -264,8 +264,8 @@ public class DashboardActivity extends FragmentActivity {
 
         alarm.setNotes(((EditText) view.findViewById(R.id.notes)).getText().toString());
 
-        Assessment fieldAssessment = new Assessment();
-        NMI fieldNmi = new NMI();
+        Assessment fieldAssessment = alarm.getFieldAssessment();
+        NMI fieldNmi = fieldAssessment.getNmi();
 
         fieldNmi.setConscious(getRadioGroupAnswer(view, R.id.radioAssessmentQuestion1Yes, R.id.radioAssessmentQuestion1No));
         fieldNmi.setBreathing(getRadioGroupAnswer(view, R.id.radioAssessmentQuestion2Yes, R.id.radioAssessmentQuestion2No));
@@ -275,10 +275,12 @@ public class DashboardActivity extends FragmentActivity {
         fieldAssessment.setPatientInformationChecked(true);
         fieldAssessment.setSensorsChecked(true);
 
-        fieldNmi.save();
-        fieldAssessment.setNmi(fieldNmi);
-        fieldAssessment.save();
-        alarm.setFieldAssessment(fieldAssessment);
+//        fieldNmi.save();
+//        fieldAssessment.setNmi(fieldNmi);
+//        fieldAssessment.save();
+//        alarm.setFieldAssessment(fieldAssessment);
+        alarm.getFieldAssessment().getNmi().save();
+        alarm.getFieldAssessment().save();
         alarm.save();
         alarm.setActive(false);
         alarm.setAddToUploadQueue(true);

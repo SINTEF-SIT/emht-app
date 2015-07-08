@@ -5,8 +5,8 @@ package sintef.android.emht.utils;
  */
 public class Constants {
 
-    public static final String SERVER_URL = "http://129.241.105.197:9000";
-//    public static final String SERVER_URL = "http://10.218.86.177:9000";
+//    public static final String SERVER_URL = "http://129.241.105.197:9000";
+    public static final String SERVER_URL = "http://10.218.86.177:9000";
 
     public static final String ACCOUNT_ID = "account_id";
     public static final String ACCOUNT_TYPE = "sintef.android.emht";

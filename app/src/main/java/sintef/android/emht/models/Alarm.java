@@ -29,7 +29,6 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
     private boolean expired = false;
     private AlarmAttendant attendant;
     private AlarmAttendant mobileCareTaker;
-    private String alarmLog;
     private String notes;
     private Patient patient;
     private double latitude;
@@ -133,14 +132,6 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
 
     public void setAttendant(AlarmAttendant attendant) {
         this.attendant = attendant;
-    }
-
-    public String getAlarmLog() {
-        return alarmLog;
-    }
-
-    public void setAlarmLog(String alarmLog) {
-        this.alarmLog = alarmLog;
     }
 
     public String getNotes() {

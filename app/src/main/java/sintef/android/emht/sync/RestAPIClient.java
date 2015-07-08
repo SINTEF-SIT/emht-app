@@ -4,13 +4,16 @@ import android.accounts.AuthenticatorException;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 import sintef.android.emht.utils.Constants;
 
@@ -44,11 +47,15 @@ public class RestAPIClient {
         connection.setDoOutput(false);
         connection.setInstanceFollowRedirects(false);
         connection.setRequestMethod("POST");
+        if (postData != null) connection.setRequestProperty("Content-Type", "application/json;charset=utf-8");
         connection.setRequestProperty("Cookie", authToken);
         // all post data are of type json. if no data is to be sent, do not set the content-type
         if (postData != null) {
-            connection.setRequestProperty("Content-Type", "application/json;charset=utf8");
-            new DataOutputStream(connection.getOutputStream()).writeBytes(postData);
+//            new DataOutputStream(connection.getOutputStream()).writeBytes(postData); // does not support UTF-8
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
+            bw.write(postData);
+            bw.flush();
+            bw.close();
         }
         Log.w(TAG, convertStreamToString(connection.getErrorStream()));
         exceptionHandler(connection.getResponseCode());
