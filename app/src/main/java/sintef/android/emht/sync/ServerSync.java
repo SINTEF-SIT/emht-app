@@ -91,7 +91,6 @@ public class ServerSync extends Service implements
 
         if (mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE).length > 0) {
             account = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE)[Constants.ACCOUNT_INDEX];
-            restAPIClient = new RestAPIClient(mAccountManager.getUserData(account, Constants.pref_key_SERVER_URL));
             if (hasNetworkConnection) startSync();
         }
 
@@ -108,6 +107,7 @@ public class ServerSync extends Service implements
     }
 
     private void startSync() {
+        restAPIClient = new RestAPIClient(mAccountManager.getUserData(account, Constants.pref_key_SERVER_URL));
         mGoogleApiClient.connect();
     }
 
@@ -271,6 +271,8 @@ public class ServerSync extends Service implements
     }
 
     private void sendLocationData(Location location) {
+        // if restAPIClient is null we do not have an account and need to wait for onAccountsUpdated
+        if (restAPIClient == null) return;
         final AccountManagerFuture<Bundle> future = mAccountManager.getAuthToken(account, authTokenType, null, true, null, null);
         final Map<String, Double> parameters = new HashMap<>();
         parameters.put("latitude", location.getLatitude());
