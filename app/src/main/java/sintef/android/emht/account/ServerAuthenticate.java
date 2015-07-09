@@ -47,7 +47,7 @@ public class ServerAuthenticate {
         connection.setRequestMethod("POST");
         connection.setInstanceFollowRedirects(false);
         HttpURLConnection.setFollowRedirects(false);
-        connection.setConnectTimeout(10*1000);
+        connection.setConnectTimeout(10 * 1000);
         connection.setReadTimeout(10*1000);
         new DataOutputStream(connection.getOutputStream()).writeBytes(parameters);
         connection.getHeaderFields();
@@ -67,6 +67,6 @@ public class ServerAuthenticate {
         if(session != null) {
             return session;
         }
-        throw new Exception("Username and/or password is incorrect");
+        throw new AuthenticatorException("Username and/or password is incorrect");
     }
 }

@@ -4,6 +4,7 @@ import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
 import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
@@ -57,11 +58,17 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         mAccountManager = AccountManager.get(mContext);
         String authToken = mAccountManager.peekAuthToken(account, authTokenType);
         if (TextUtils.isEmpty(authToken)) {
+            Log.w(TAG, "auth token is empty");
             final String password = mAccountManager.getPassword(account);
             if (password != null) {
+                Log.w(TAG, "password is empty");
                 try {
                     String serverUrl = mAccountManager.getUserData(account, Constants.pref_key_SERVER_URL);
                     authToken = mAccountGeneral.mServerAuthenticate.userSignIn(account.name, password, authTokenType, serverUrl);
+                } catch (AuthenticatorException e) {
+                    // if we get here the password has changed in the backend, or the user has been deleted
+                    Log.w(TAG, "clearing password");
+                    mAccountManager.clearPassword(account);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

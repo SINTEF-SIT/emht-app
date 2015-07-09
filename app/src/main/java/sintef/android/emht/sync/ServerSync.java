@@ -168,6 +168,7 @@ public class ServerSync extends Service implements
         for (Account acc : accounts) {
             if (acc.type.equals(Constants.ACCOUNT_TYPE)) {
                 account = acc;
+                sharedPreferences.edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, false).apply();
                 stopSync();
                 startSync();
             }
@@ -199,15 +200,7 @@ public class ServerSync extends Service implements
         syncBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         syncBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
 
-//        SyncRequest.Builder mBuilder = new SyncRequest.Builder()
-//                .setExpedited(true) // prioritize this sync
-//                .setSyncAdapter(account, Constants.PROVIDER_AUTHORITIES)
-//                .setManual(true)
-//                .syncOnce()
-//                .setExtras(new Bundle()); // Bundle mandatory to build request
-
         ContentResolver.setSyncAutomatically(account, Constants.PROVIDER_AUTHORITIES, true);
-//        ContentResolver.requestSync(mBuilder.build());
         ContentResolver.requestSync(account, Constants.PROVIDER_AUTHORITIES, syncBundle);
     }
 

@@ -27,6 +27,8 @@ public class RestAPIClient {
         this.authToken = authToken;
     }
 
+    public synchronized String getAuthToken() { return authToken; }
+
     String convertStreamToString(java.io.InputStream is) {
         if (is == null) return "";
         try {
@@ -84,6 +86,8 @@ public class RestAPIClient {
     private void exceptionHandler(int responseCode) throws Exception {
         Log.w(TAG, "response code: " + responseCode);
         switch (responseCode) {
+            case (200):
+                break;
             case (303):
                 throw new AuthenticatorException("Not logged in");
             case (400):
