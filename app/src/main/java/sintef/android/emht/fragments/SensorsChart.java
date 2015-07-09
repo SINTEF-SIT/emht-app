@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import de.greenrobot.event.EventBus;
+import sintef.android.emht.models.Patient;
 import sintef.android.emht.models.SensorData;
 
 /**
@@ -37,9 +38,10 @@ public class SensorsChart implements View.OnClickListener {
     private double mYAxisMax = Double.MIN_VALUE;
     private double mZoomLevel = 1;
     private int mYAxisPadding = 10;
-    private static final int TEN_SEC = 300000;
-    private static final int TWO_SEC = 20000;
+    private static final int XRANGE = 600000; // 10 minutes
+    private static final int XRIGHTPADDING = 0;
     private static final String TIME = "H:mm:ss";
+    private Long pId;
 
     private final ZoomListener mZoomListener = new ZoomListener() {
         @Override
@@ -61,19 +63,22 @@ public class SensorsChart implements View.OnClickListener {
     };
 
 
-    public SensorsChart(Activity activity, ViewGroup chartView) {
+    public SensorsChart(Activity activity, ViewGroup chartView, Long pId) {
         this.mActivity = activity;
+        this.pId = pId;
         EventBus.getDefault().registerSticky(this);
         mSeries = new HashMap<>();
         mDataset = new XYMultipleSeriesDataset();
         mRenderer = new XYMultipleSeriesRenderer();
 
-        mRenderer.setLabelsColor(Color.BLACK);
+        mRenderer.setXLabelsColor(Color.BLACK);
+        mRenderer.setYLabelsPadding(25);
+        mRenderer.setYLabelsColor(0, Color.BLACK);
         mRenderer.setAxesColor(Color.BLACK);
         mRenderer.setGridColor(Color.DKGRAY);
         mRenderer.setBackgroundColor(Color.WHITE);
         mRenderer.setApplyBackgroundColor(true);
-        mRenderer.setMarginsColor(Color.WHITE);
+        mRenderer.setMarginsColor(Color.argb(204, 241, 241, 241)); // same as background
 
         mRenderer.setLegendTextSize(20);
         mRenderer.setLabelsTextSize(20);
@@ -94,8 +99,10 @@ public class SensorsChart implements View.OnClickListener {
         buildSensorsChart();
     }
 
-    private void buildSensorsChart() {
-        for (SensorData sensorData : SensorData.findWithQuery(SensorData.class, "select * from alarm order by ROWID asc limit 50")) {
+    public void buildSensorsChart() {
+        Log.w(TAG, "buildSensorChart");
+        for (SensorData sensorData : SensorData.findWithQuery(SensorData.class, "select * from sensor_data where patient = ? order by ROWID desc limit 50", Long.toString(pId))) {
+            Log.w(TAG, "found sensor data in db");
             //updateChart(sensorData);
             //Log.w(TAG, sensorData.getValue().toString());
             if (sensorData == null) Log.w(TAG, "sensor data is null");
@@ -111,21 +118,27 @@ public class SensorsChart implements View.OnClickListener {
     }
 
     private void updateChart(SensorData sensorData) {
-        if (mSeries.containsKey(sensorData.getReadingType())) {
-            TimeSeries series = mSeries.get(sensorData.getReadingType());
+        if (mSeries.containsKey(sensorData.getReadingTypeInNaturalLanguage())) {
+            TimeSeries series = mSeries.get(sensorData.getReadingTypeInNaturalLanguage());
             series.add(sensorData.getDate(), sensorData.getValue());
-            Log.w(TAG, "added new chart series");
+            updateMinMaxXY(sensorData.getValue());
+            Log.w(TAG, "added data to chart series");
         } else {
-            TimeSeries series = new TimeSeries(sensorData.getReadingType());
+            TimeSeries series = new TimeSeries(sensorData.getReadingTypeInNaturalLanguage());
             series.add(sensorData.getDate(), sensorData.getValue());
-            mSeries.put(sensorData.getReadingType(), series);
+            mSeries.put(sensorData.getReadingTypeInNaturalLanguage(), series);
             mDataset.addSeries(series);
             mRenderer.addSeriesRenderer(getSeriesRenderer(getColorForRenderer(sensorData.getReadingType())));
-            Log.w(TAG, "added data to chart series");
+            Log.w(TAG, "added new chart series");
         }
         scrollGraph(sensorData.getDate().getTime());
         mChartView.repaint();
         Log.w(TAG, "graph repainted");
+    }
+
+    private void updateMinMaxXY(Double value) {
+        if (mYAxisMin > value) mYAxisMin = value;
+        if (mYAxisMax < value) mYAxisMax = value;
     }
 
     private int getColorForRenderer(String readingType) {
@@ -136,6 +149,8 @@ public class SensorsChart implements View.OnClickListener {
                 return Color.BLUE;
             case ("systolicPressure"):
                 return Color.GREEN;
+            case ("battery"):
+                return Color.MAGENTA;
             default:
                 return Color.BLACK;
         }
@@ -152,8 +167,13 @@ public class SensorsChart implements View.OnClickListener {
     }
 
     private void scrollGraph(final long time) {
-        final double[] limits = new double[] { time - TEN_SEC * mZoomLevel, time + TWO_SEC * mZoomLevel, mYAxisMin - mYAxisPadding,
-                mYAxisMax + mYAxisPadding };
+        // mZoomLevel is set to 1
+        final double[] limits = new double[] {
+                time - XRANGE * mZoomLevel, // minX
+                time + XRIGHTPADDING * mZoomLevel, // maxX
+                mYAxisMin - mYAxisPadding, // minY
+                mYAxisMax + mYAxisPadding // maxY
+        };
         mRenderer.setRange(limits);
     }
 

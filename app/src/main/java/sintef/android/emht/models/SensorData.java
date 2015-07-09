@@ -62,4 +62,19 @@ public class SensorData extends SugarRecord<SensorData> implements Serializable{
     public void setPatient(Patient patient) {
         this.patient = patient;
     }
+
+    public String getReadingTypeInNaturalLanguage() {
+        switch (this.readingType) {
+            case ("diastolicPressure"):
+                return "Diastolic pressure";
+            case ("systolicPressure"):
+                return "Systolic pressure";
+            case ("heartRate"):
+                return "Heart rate";
+            case ("battery"):
+                return "Battery";
+            default:
+                return "Unknown";
+        }
+    }
 }

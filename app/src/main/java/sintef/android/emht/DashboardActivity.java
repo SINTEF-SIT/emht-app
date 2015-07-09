@@ -51,11 +51,16 @@ public class DashboardActivity extends FragmentActivity {
     private boolean mBound = false;
     private ActionBarDrawerToggle mDrawerToggle;
     private SlidingUpPanelLayout slidingUpPanelLayout;
+    private Long patientId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+        if (getIntent().getExtras().getLong(ALARM_ID) != 0L) {
+            Alarm alarm = Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID));
+            if (alarm.getPatient() != null) patientId = alarm.getPatient().getPatientId();
+        }
 
         if (getResources().getBoolean(R.bool.isTablet)) {
             RegistrationFragment registrationFragment = new RegistrationFragment();
@@ -145,7 +150,7 @@ public class DashboardActivity extends FragmentActivity {
             });
 
             //if (getIntent().getExtras().getLong(ALARM_ID) != 0L) mServerSync.updateSensors(getIntent().getExtras().getLong(ALARM_ID));
-            if (getIntent().getExtras().getLong(ALARM_ID) != 0L) mServerSync.updateSensors(6L);
+            if (getIntent().getExtras().getLong(ALARM_ID) != 0L && patientId != null) mServerSync.startSensorPolling(patientId);
         }
 
         @Override
@@ -187,7 +192,7 @@ public class DashboardActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mBound) mServerSync.startSensorPolling();
+        if (mBound && patientId != null) mServerSync.startSensorPolling(patientId);
     }
 
     @Override

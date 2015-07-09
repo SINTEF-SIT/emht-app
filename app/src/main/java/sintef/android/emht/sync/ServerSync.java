@@ -221,22 +221,28 @@ public class ServerSync extends Service implements
         }
     }
 
-    public void startSensorPolling() {
+    public void startSensorPolling(final Long patientId) {
         Log.w(TAG, "starting sensor polling");
-        sensorPollTimer = new Timer();
+        if (sensorPollTimer == null) sensorPollTimer = new Timer();
         sensorPollTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                updateSensors(6L);
+                updateSensors(patientId);
             }
         }, 0, 10000); // updateAlarms every 10 seconds
     }
 
-    public void stopSensorPolling() { if (sensorPollTimer != null) sensorPollTimer.cancel(); }
+    public void stopSensorPolling() {
+        if (sensorPollTimer != null) {
+            sensorPollTimer.cancel();
+            Log.w(TAG, "stopping sensor polling");
+        }
+    }
 
     public void updateSensors(long patientId) {
         if (!hasNetworkConnection) return;
         Log.w(TAG, "polling server for sensor datas");
+        final Long pId = Patient.find(Patient.class, "patient_id = ? limit 1", Long.toString(patientId)).get(0).getId();
         new AsyncTask<Long, Void, Void>() {
             String json = null;
             @Override
@@ -254,7 +260,7 @@ public class ServerSync extends Service implements
                         /* add reading to db if it does not exist */
                         if (SensorData.find(SensorData.class, "sensor_data_id = ?", Long.toString(reading.getLong("id"))).size() == 0) {
                             SensorData sensorData = objectMapper.readValue(reading.toString(), SensorData.class);
-                            sensorData.setPatient(Patient.findById(Patient.class, params[0]));
+                            sensorData.setPatient(Patient.findById(Patient.class, pId));
                             sensorData.save();
                             mEventBus.post(sensorData);
                             Log.w(TAG, "added new sensor data to db");

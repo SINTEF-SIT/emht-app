@@ -21,6 +21,8 @@ public class AssessmentFragment extends Fragment {
     private static final String ALARM_ID = "alarm_id";
     private long alarmId;
     private final String TAG = this.getClass().getSimpleName();
+    private Long pId;
+    private SensorsChart sensorsChart;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,7 +42,10 @@ public class AssessmentFragment extends Fragment {
         if (alarm.getAssessment().isPatientInformationChecked()) ((TextView) assessmentView.findViewById(R.id.assessmentLogPatientInformationCheckedAnswer)).setText(getResources().getString(R.string.yes));
         if (alarm.getAssessment().isSensorsChecked()) ((TextView) assessmentView.findViewById(R.id.assessmentLogSensorsCheckedAnswer)).setText(getResources().getString(R.string.yes));
 
-        if (alarm.getPatient() != null && alarm.getPatient().getObs() != null) ((TextView) assessmentView.findViewById(R.id.cautionLog)).setText(alarm.getPatient().getObs());
+        if (alarm.getPatient() != null) {
+            if (alarm.getPatient().getObs() != null) ((TextView) assessmentView.findViewById(R.id.cautionLog)).setText(alarm.getPatient().getObs());
+            pId = alarm.getPatient().getId();
+        }
 
         return assessmentView;
     }
@@ -54,12 +59,19 @@ public class AssessmentFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (sensorsChart != null) sensorsChart.buildSensorsChart();
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (pId == null) return;
         if (getView() == null) return;
         LinearLayout chartView = (LinearLayout) getView().findViewById(R.id.sensors_chart);
         if (chartView == null) return;
 
-        new SensorsChart(getActivity(), chartView);
+        sensorsChart = new SensorsChart(getActivity(), chartView, pId);
     }
 }
