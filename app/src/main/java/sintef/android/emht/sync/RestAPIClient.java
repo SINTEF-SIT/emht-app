@@ -1,23 +1,14 @@
 package sintef.android.emht.sync;
 
 import android.accounts.AuthenticatorException;
-import android.content.Context;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.nio.charset.Charset;
-
-import sintef.android.emht.utils.Constants;
 
 /**
  * Created by iver on 7/6/15.
@@ -55,11 +46,14 @@ public class RestAPIClient {
         connection.setRequestProperty("Cookie", authToken);
         // all post data are of type json. if no data is to be sent, do not set the content-type
         if (postData != null) {
-//            new DataOutputStream(connection.getOutputStream()).writeBytes(postData); // does not support UTF-8
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
-            bw.write(postData);
-            bw.flush();
-            bw.close();
+            BufferedWriter bw = null;
+            try {
+                bw = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
+                bw.write(postData);
+                bw.flush();
+            } finally {
+                if (bw != null) bw.close();
+            }
         }
         Log.w(TAG, convertStreamToString(connection.getErrorStream()));
         exceptionHandler(connection.getResponseCode());
@@ -98,6 +92,8 @@ public class RestAPIClient {
                 throw new AuthenticatorException("Forbidden");
             case (500):
                 throw new ServerErrorException("Server is down");
+            default:
+                throw new Exception("Unknown exception");
         }
     }
 

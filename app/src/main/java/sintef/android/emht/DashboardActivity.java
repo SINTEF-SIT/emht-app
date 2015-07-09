@@ -52,13 +52,16 @@ public class DashboardActivity extends FragmentActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private SlidingUpPanelLayout slidingUpPanelLayout;
     private Long patientId;
+    private Alarm alarm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
         if (getIntent().getExtras().getLong(ALARM_ID) != 0L) {
-            Alarm alarm = Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID));
+            alarm = Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID));
+            alarm.setActive(true);
+            alarm.save();
             if (alarm.getPatient() != null) patientId = alarm.getPatient().getPatientId();
         }
 
@@ -207,7 +210,7 @@ public class DashboardActivity extends FragmentActivity {
                 (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED || slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
             slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            super.onBackPressed();
+//            super.onBackPressed();
         }
     }
 
@@ -234,7 +237,7 @@ public class DashboardActivity extends FragmentActivity {
     }
 
     public void onDismissIncidentButtonClicked(View view) {
-        dismissDialog();
+//        dismissDialog();
     }
 
     public void onCompleteIncidentButtonClicked(View view) {

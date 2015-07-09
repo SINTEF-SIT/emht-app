@@ -9,6 +9,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncRequest;
+import android.content.SyncResult;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Binder;

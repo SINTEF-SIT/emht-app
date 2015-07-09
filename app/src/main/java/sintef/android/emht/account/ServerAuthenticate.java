@@ -1,5 +1,6 @@
 package sintef.android.emht.account;
 
+import android.accounts.AuthenticatorException;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -32,7 +33,7 @@ public class ServerAuthenticate {
         this.mContext = context;
     }
 
-    public String userSignIn(String username, String password, String authTokenType, String serverUrl) throws IOException, URISyntaxException {
+    public String userSignIn(String username, String password, String authTokenType, String serverUrl) throws Exception {
 
         HttpURLConnection connection;
         String parameters = "username=" + username + "&password=" + password;
@@ -41,13 +42,14 @@ public class ServerAuthenticate {
         URL url = new URL(serverUrl + "/login");
         CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
         connection = (HttpURLConnection) url.openConnection();
-        connection.setDoOutput(true);
+        connection.setDoOutput(false);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         connection.setRequestMethod("POST");
-        connection.setInstanceFollowRedirects(true);
-        HttpURLConnection.setFollowRedirects(true);
+        connection.setInstanceFollowRedirects(false);
+        HttpURLConnection.setFollowRedirects(false);
+        connection.setConnectTimeout(10*1000);
+        connection.setReadTimeout(10*1000);
         new DataOutputStream(connection.getOutputStream()).writeBytes(parameters);
-
         connection.getHeaderFields();
         Log.w(TAG, "looking for cookie");
         CookieManager cm = (CookieManager) CookieHandler.getDefault();
@@ -65,6 +67,6 @@ public class ServerAuthenticate {
         if(session != null) {
             return session;
         }
-        return null;
+        throw new Exception("Username and/or password is incorrect");
     }
 }

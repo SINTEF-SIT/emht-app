@@ -77,12 +77,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (RestAPIClient.ServerErrorException e) {
             syncResult.stats.numIoExceptions++;
             e.printStackTrace();
+        } catch (RestAPIClient.BadRequestException e) {
+            syncResult.stats.numAuthExceptions++;
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-
 
     private void sendAlarms(Account account) throws Exception {
         List<Alarm> alarms = Alarm.find(Alarm.class, "add_to_upload_queue = ?", "1");
@@ -130,6 +131,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     alarmObj.getAssessment().save();
                     alarmObj.getAttendant().save();
                     alarmObj.getMobileCareTaker().save();
+
+                    // check gcm reg id of mobile caretaker
+                    if (alarmObj.getMobileCareTaker().getGcmRegId().equals(
+                            PreferenceManager.getDefaultSharedPreferences(mContext).getString(Constants.pref_key_GCM_TOKEN, "NO_KEY")))
+                        PreferenceManager.getDefaultSharedPreferences(mContext).edit().putBoolean(Constants.pref_key_SENT_TOKEN_TO_SERVER, false);
+
                     alarmObj.save();
                     EventBus.getDefault().post(new NewAlarmEvent((alarmObj.getId())));
                     Log.w(TAG, "added new alarm to db");
