@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
@@ -30,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -48,6 +48,7 @@ import sintef.android.emht.events.SyncEvent;
 import sintef.android.emht.models.Alarm;
 import sintef.android.emht.sync.RegistrationIntentService;
 import sintef.android.emht.sync.ServerSync;
+import sintef.android.emht.utils.CachingUrlTileProvider;
 import sintef.android.emht.utils.Constants;
 import sintef.android.emht.utils.Helper;
 
@@ -64,6 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap googleMap;
     private boolean firstAlarmSet = false;
     private int padding;
+    private float maxZoom = 17.0f; // to avoid breaching openstreetmaps tile usage policy
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -96,6 +98,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
+        // add our cached tile provider to map
+        mapFragment.getMap().setMapType(GoogleMap.MAP_TYPE_NONE);
+        mapFragment.getMap().addTileOverlay(new CachingUrlTileProvider(this, 256, 256) {
+            @Override
+            public String getTileUrl(int x, int y, int z) {
+                if (z > maxZoom) return null;
+                return String.format("https://a.tile.openstreetmap.org/%3$s/%1$s/%2$s.png",x,y,z);
+            }
+        }.createTileOverlayOptions());
         mapFragment.getMapAsync(this);
         markerMap = new HashMap<>();
         EventBus.getDefault().register(this);
@@ -166,7 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
         this.googleMap = googleMap;
         Log.w(TAG, "map ready");
         googleMap.setMyLocationEnabled(true);
@@ -198,6 +209,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         return builder.create();
                     }
                 }.show(getSupportFragmentManager(), "InfoWindowDialog");
+            }
+        });
+
+        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                if (cameraPosition.zoom > maxZoom)
+                    googleMap.animateCamera(CameraUpdateFactory.zoomTo(maxZoom));
             }
         });
 
@@ -258,7 +277,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     else googleMap.addMarker(marker);
                     queueNumber++;
                 }
-
                 LatLngBounds bounds = builder.build();
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
             }

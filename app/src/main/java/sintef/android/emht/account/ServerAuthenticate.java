@@ -2,23 +2,17 @@ package sintef.android.emht.account;
 
 import android.accounts.AuthenticatorException;
 import android.content.Context;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-
-import sintef.android.emht.utils.Constants;
 
 /**
  * Created by iver on 10/06/15.

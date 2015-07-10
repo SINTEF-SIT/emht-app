@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 
 import de.greenrobot.event.EventBus;
-import sintef.android.emht.models.Patient;
 import sintef.android.emht.models.SensorData;
 
 /**

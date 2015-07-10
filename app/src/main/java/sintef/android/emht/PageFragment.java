@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import sintef.android.emht.fragments.ActionsFragment;
 import sintef.android.emht.fragments.AssessmentFragment;
-import sintef.android.emht.fragments.IncidentFragment;
+import sintef.android.emht.fragments.EmptyFragment;
 import sintef.android.emht.fragments.RegistrationFragment;
 
 /**
@@ -39,8 +39,7 @@ public class PageFragment extends Fragment {
                 fragment = new ActionsFragment();
                 break;
             default:
-                fragment = new IncidentFragment();
-                break;
+                fragment = new EmptyFragment();
         }
 
         fragment.setArguments(args);
