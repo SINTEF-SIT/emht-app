@@ -27,7 +27,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/name"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/calleeName"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -43,7 +45,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/address"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/calleeAddress"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -59,7 +63,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/phoneNumber"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/calleePhoneNumber"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,7 +100,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/name"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/patientName"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -110,7 +118,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/address"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/patientAddress"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -126,7 +136,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/personalNumber"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/patientPersonalNumber"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -142,7 +154,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/phoneNumber"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/patientPhoneNumber"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -158,7 +172,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/age"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/patientAge"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -174,7 +190,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/incidentAddress"
-                    android:padding="10dp"/>
+                    android:padding="10dp"
+                    android:layout_toLeftOf="@+id/patientIncidentLocation"
+                    android:layout_alignParentLeft="true"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

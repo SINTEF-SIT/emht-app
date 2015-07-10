@@ -23,6 +23,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion1"
                 android:padding="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/assessmentLogAnswer1"
                 />
 
             <TextView
@@ -45,6 +47,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion2"
                 android:padding="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/assessmentLogAnswer2"
                 />
 
             <TextView
@@ -67,6 +71,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion3"
                 android:padding="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/assessmentLogAnswer3"
                 />
 
             <TextView
@@ -89,6 +95,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion4"
                 android:padding="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/assessmentLogAnswer4"
                 />
 
             <TextView
@@ -111,6 +119,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion5"
                 android:padding="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/assessmentLogAnswer5"
                 />
 
             <TextView
@@ -133,6 +143,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/patient_information_checked"
                 android:padding="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/assessmentLogPatientInformationCheckedAnswer"
                 />
 
             <TextView
@@ -155,6 +167,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/sensors_checked"
                 android:padding="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/assessmentLogSensorsCheckedAnswer"
                 />
 
             <TextView
@@ -182,8 +196,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion1"
-                android:paddingLeft="10dp"/>
+                android:paddingLeft="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/radioAssessmentQuestion1"/>
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/radioAssessmentQuestion1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -207,8 +224,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion2"
-                android:paddingLeft="10dp"/>
+                android:paddingLeft="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/radioAssessmentQuestion2"/>
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/radioAssessmentQuestion2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -232,8 +252,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion3"
-                android:paddingLeft="10dp"/>
+                android:paddingLeft="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/radioAssessmentQuestion3"/>
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/radioAssessmentQuestion3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -257,8 +280,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion4"
-                android:paddingLeft="10dp"/>
+                android:paddingLeft="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/radioAssessmentQuestion4"/>
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/radioAssessmentQuestion4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -283,8 +309,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/assessmentQuestion5"
-                android:paddingLeft="10dp"/>
+                android:paddingLeft="10dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/radioAssessmentQuestion5"/>
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/radioAssessmentQuestion5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
