@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
@@ -199,6 +200,13 @@ public class DashboardActivity extends FragmentActivity implements View.OnTouchL
         } else {
 //            super.onBackPressed();
         }
+    }
+
+    public void startNavigation(View view) {
+        startActivity(new Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("http://maps.google.com/maps?daddr=" + alarm.getOccuranceAddress())
+        ));
     }
 
     private void dismissDialog() {
