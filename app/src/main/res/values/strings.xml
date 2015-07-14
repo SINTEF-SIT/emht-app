@@ -45,6 +45,8 @@
     <string name="safety_alarm">Safety</string>
     <string name="phone_alarm">Phone</string>
     <string name="undefined_alarm">Undefined</string>
+    <string name="police_alarm">Police</string>
+    <string name="fire_alarm">Fire</string>
 
     <!-- tab fragment -->
     <string name="tabRegistration">Registration</string>

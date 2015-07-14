@@ -199,25 +199,21 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
     }
 
     public int getTypeInNaturalLanguage() {
-        switch (this.type) {
-            case ("safety_alarm"):
-                return R.string.safety_alarm;
-            case ("phone"):
-                return R.string.phone_alarm;
-            default:
-                return R.string.undefined_alarm;
-        }
+
+        if (this.type.contains("safety")) return R.string.safety_alarm;
+        if (this.type.contains("phone")) return R.string.phone_alarm;
+        if (this.type.contains("police")) return R.string.police_alarm;
+        if (this.type.contains("fire")) return R.string.fire_alarm;
+        return R.string.undefined_alarm;
     }
 
     public int getImageResourceForType() {
-        switch (this.type) {
-            case ("safety_alarm"):
-                return R.mipmap.ic_safety_alarm;
-            case ("phone"):
-                return R.mipmap.ic_phone_alarm;
-            default:
-                return R.mipmap.ic_launcher;
-        }
+
+        if (this.type.contains("safety")) return R.mipmap.ic_safety_alarm;
+        if (this.type.contains("phone")) return R.mipmap.ic_phone_alarm;
+        if (this.type.contains("police")) return R.mipmap.ic_police_alarm;
+        if (this.type.contains("fire")) return R.mipmap.ic_fire_alarm;
+        return R.mipmap.ic_launcher;
     }
 
     public boolean isActive() {
