@@ -269,7 +269,7 @@ public class DashboardActivity extends FragmentActivity implements View.OnTouchL
         fieldNmi.setTalking(getRadioGroupAnswer(view, R.id.radioAssessmentQuestion5Yes, R.id.radioAssessmentQuestion5No));
         fieldAssessment.setPatientInformationChecked(true);
         fieldAssessment.setSensorsChecked(true);
-        
+
 //        fieldNmi.save();
 //        fieldAssessment.setNmi(fieldNmi);
 //        fieldAssessment.save();
