@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import java.net.URL;
+
 import sintef.android.emht.R;
 import sintef.android.emht.utils.Constants;
 
@@ -63,8 +65,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         final String userName = ((TextView) findViewById(R.id.username)).getText().toString();
         final String userPass = ((TextView) findViewById(R.id.password)).getText().toString();
 
-        String userServerUrl = ((TextView) findViewById(R.id.server_url)).getText().toString();
-        final String serverUrl = userServerUrl;
+        final String userServerUrl = ((TextView) findViewById(R.id.server_url)).getText().toString();
 
         progressDialog.setCancelable(false);
         progressDialog.setIndeterminate(true);
@@ -82,6 +83,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
                 try {
                     Log.w(TAG, "trying to get authtoken");
+                    URL url = new URL(userServerUrl);
+                    String serverUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
                     authToken = AccountGeneral.getInstance(getApplicationContext()).mServerAuthenticate.userSignIn(userName, userPass, null, serverUrl);
                     Log.w(TAG, authToken);
 

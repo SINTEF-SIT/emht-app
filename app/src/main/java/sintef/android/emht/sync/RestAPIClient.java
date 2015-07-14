@@ -83,7 +83,7 @@ public class RestAPIClient {
         }
     }
 
-    private void exceptionHandler(int responseCode) throws Exception {
+    public void exceptionHandler(int responseCode) throws Exception {
         Log.w(TAG, "response code: " + responseCode);
         switch (responseCode) {
             case (200):

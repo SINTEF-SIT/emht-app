@@ -170,6 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void logout(View view) {
         // remove account and restart app
+        stopService(new Intent(this, ServerSync.class));
         Account account = AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE)[0];
         final AccountManagerFuture<Bundle> future = AccountManager.get(this).removeAccount(account, this, new AccountManagerCallback<Bundle>() {
             @Override

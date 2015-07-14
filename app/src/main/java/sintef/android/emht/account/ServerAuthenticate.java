@@ -14,6 +14,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
+import sintef.android.emht.sync.RestAPIClient;
+
 /**
  * Created by iver on 10/06/15.
  */
@@ -42,8 +44,9 @@ public class ServerAuthenticate {
         connection.setInstanceFollowRedirects(false);
         HttpURLConnection.setFollowRedirects(false);
         connection.setConnectTimeout(10 * 1000);
-        connection.setReadTimeout(10*1000);
+        connection.setReadTimeout(10 * 1000);
         new DataOutputStream(connection.getOutputStream()).writeBytes(parameters);
+//        new RestAPIClient(serverUrl).exceptionHandler(connection.getResponseCode());
         connection.getHeaderFields();
         Log.w(TAG, "looking for cookie");
         CookieManager cm = (CookieManager) CookieHandler.getDefault();
