@@ -102,6 +102,7 @@
     <string name="dialog_select_alarm">Make this alarm your current assignment?</string>
     <string name="map_header">EMHT</string>
     <string name="number_of_alarms">Number of alarms:</string>
+    <string name="central_phone_number">91331021</string>
 
     <!-- GCM -->
     <string name="gcm_new_alarm">New alarm</string>

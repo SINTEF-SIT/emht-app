@@ -17,6 +17,15 @@
         android:layout_height="fill_parent"
         android:id="@+id/map"
         tools:context=".MapsActivity"
-        android:name="com.google.android.gms.maps.MapFragment" />
+        android:name="com.google.android.gms.maps.MapFragment">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_phone_icon"
+            android:layout_gravity="top|left"
+            android:onClick="callCentral"/>
+
+    </fragment>
 
 </LinearLayout>

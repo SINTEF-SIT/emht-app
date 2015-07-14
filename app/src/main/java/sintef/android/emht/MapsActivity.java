@@ -15,6 +15,7 @@ import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -345,5 +346,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+    }
+
+    public void callCentral(View view) {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        String number = getResources().getString(R.string.central_phone_number);
+        callIntent.setData(Uri.parse("tel:"+number));
+        startActivity(callIntent);
     }
 }
