@@ -55,17 +55,10 @@
         android:paddingRight="20dp">
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/completeIncident"
-            android:layout_alignParentRight="true"
             android:onClick="onCompleteIncidentButtonClicked"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dismissIncident"
-            android:layout_alignParentLeft="true"
-            android:onClick="onDismissIncidentButtonClicked"/>
 
     </RelativeLayout>
 

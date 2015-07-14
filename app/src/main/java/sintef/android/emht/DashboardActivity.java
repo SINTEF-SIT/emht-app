@@ -37,7 +37,7 @@ import sintef.android.emht.sync.ServerSync;
 /**
  * Created by iver on 10/06/15.
  */
-public class DashboardActivity extends FragmentActivity {
+public class DashboardActivity extends FragmentActivity implements View.OnTouchListener {
 
     private final String TAG = this.getClass().getSimpleName();
     private static AssessmentFragment assessmentFragment;
@@ -92,7 +92,7 @@ public class DashboardActivity extends FragmentActivity {
         }
 
         slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        findViewById(R.id.sliding_layout).setOnTouchListener(new View.OnTouchListener() {
+        findViewById(R.id.drawer_fragment).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 Log.w(TAG, "on touch");
@@ -107,10 +107,6 @@ public class DashboardActivity extends FragmentActivity {
         ((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
                 Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID)).getNotes()
         );
-//        Intent serverSync = new Intent(this, ServerSync.class);
-//        serverSync.putExtra("account_id", getIntent().getExtras().getInt("account_id"));
-//        serverSync.putExtra("auth_token_type", "dummytoken");
-//        startService(serverSync);
     }
 
     public static void setAssessmentFragment(AssessmentFragment fragment) {
@@ -147,7 +143,6 @@ public class DashboardActivity extends FragmentActivity {
                 }
             });
 
-            //if (getIntent().getExtras().getLong(ALARM_ID) != 0L) mServerSync.updateSensors(getIntent().getExtras().getLong(ALARM_ID));
             if (getIntent().getExtras().getLong(ALARM_ID) != 0L && patientId != null) mServerSync.startSensorPolling(patientId);
         }
 
@@ -167,7 +162,6 @@ public class DashboardActivity extends FragmentActivity {
             }).show();
         }
     }
-
 
     @Override
     protected void onStart() {
@@ -292,7 +286,6 @@ public class DashboardActivity extends FragmentActivity {
     }
 
     private Boolean getRadioGroupAnswer(View view, int yesId, int noId) {
-        Boolean result;
         if (((RadioButton) view.findViewById(yesId)).isChecked()) return true;
         if (((RadioButton) view.findViewById(noId)).isChecked()) return false;
         return null;
@@ -306,4 +299,8 @@ public class DashboardActivity extends FragmentActivity {
         startActivity(dashboard);
     }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        return false;
+    }
 }
