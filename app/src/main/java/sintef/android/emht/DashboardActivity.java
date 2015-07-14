@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -53,12 +54,6 @@ public class DashboardActivity extends FragmentActivity implements View.OnTouchL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-        if (getIntent().getExtras().getLong(ALARM_ID) != 0L) {
-            alarm = Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID));
-            alarm.setActive(true);
-            alarm.save();
-            if (alarm.getPatient() != null) patientId = alarm.getPatient().getPatientId();
-        }
 
         if (getResources().getBoolean(R.bool.isTablet)) {
             RegistrationFragment registrationFragment = new RegistrationFragment();
@@ -104,9 +99,12 @@ public class DashboardActivity extends FragmentActivity implements View.OnTouchL
             }
         });
 
-        ((EditText) getWindow().getDecorView().findViewById(R.id.notes)).setText(
-                Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID)).getNotes()
-        );
+        if (getIntent().getExtras().getLong(ALARM_ID) != 0L) {
+            alarm = Alarm.findById(Alarm.class, getIntent().getExtras().getLong(ALARM_ID));
+            alarm.setActive(true);
+            alarm.save();
+            if (alarm.getPatient() != null) patientId = alarm.getPatient().getPatientId();
+        }
     }
 
     public static void setAssessmentFragment(AssessmentFragment fragment) {
@@ -271,7 +269,7 @@ public class DashboardActivity extends FragmentActivity implements View.OnTouchL
         fieldNmi.setTalking(getRadioGroupAnswer(view, R.id.radioAssessmentQuestion5Yes, R.id.radioAssessmentQuestion5No));
         fieldAssessment.setPatientInformationChecked(true);
         fieldAssessment.setSensorsChecked(true);
-
+        
 //        fieldNmi.save();
 //        fieldAssessment.setNmi(fieldNmi);
 //        fieldAssessment.save();

@@ -44,7 +44,7 @@ public class RegistrationFragment extends Fragment{
         calleeName.setText(alarm.getCallee().getName());
         calleeAddress.setText(alarm.getCallee().getAddress());
         calleePhoneNumber.setText(alarm.getCallee().getPhoneNumber());
-        if (alarm.getPatient() != null) {
+        if (alarm.getPatient().getPatientId() != 1L) {
             patientName.setText(alarm.getPatient().getName());
             patientAddress.setText(alarm.getPatient().getAddress());
             patientPersonalNumber.setText(alarm.getPatient().getPersonalNumber());
@@ -53,6 +53,7 @@ public class RegistrationFragment extends Fragment{
             patientIncidentLocation.setText(alarm.getOccuranceAddress());
             patientLog.setText(alarm.getPatient().getObs());
         }
+        patientLog.setText(alarm.getNotes());
 
         return registrationView;
     }
