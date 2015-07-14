@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.io.IOException;
@@ -68,6 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean firstAlarmSet = false;
     private int padding;
     private float maxZoom = 17.0f; // to avoid breaching openstreetmaps tile usage policy
+    private TileOverlayOptions tileOverlayOptions;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -102,13 +104,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         // add our cached tile provider to map
         mapFragment.getMap().setMapType(GoogleMap.MAP_TYPE_NONE);
-        mapFragment.getMap().addTileOverlay(new CachingUrlTileProvider(this, 256, 256) {
+        tileOverlayOptions = new CachingUrlTileProvider(this, 256, 256) {
             @Override
             public String getTileUrl(int x, int y, int z) {
                 if (z > maxZoom) return null;
                 return String.format("https://a.tile.openstreetmap.org/%3$s/%1$s/%2$s.png",x,y,z);
             }
-        }.createTileOverlayOptions());
+        }.createTileOverlayOptions();
         mapFragment.getMapAsync(this);
         markerMap = new HashMap<>();
         EventBus.getDefault().register(this);
@@ -132,7 +134,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onResume();
         firstAlarmSet = false;
         updateMarkers();
-        if (googleMap != null) googleMap.clear();
+        if (googleMap != null) {
+            googleMap.clear();
+            googleMap.addTileOverlay(tileOverlayOptions);
+        }
         // Remove notifications from notification panel
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -202,6 +207,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         this.googleMap = googleMap;
+        googleMap.addTileOverlay(tileOverlayOptions);
         Log.w(TAG, "map ready");
         googleMap.setMyLocationEnabled(true);
 
@@ -256,7 +262,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private synchronized  void updateMarkers() {
         Log.w(TAG, "updating markers");
         if (Helper.getAllUnfinishedAlarmsSorted().size() == 0) return; // no alarms in queue. don't build markers
-        //if (googleMap != null) googleMap.clear();
         new AsyncTask<Void, Void, List<MarkerOptions>>() {
             LatLngBounds.Builder builder;
             @Override
