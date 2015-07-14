@@ -24,6 +24,7 @@
     <permission android:name="com.example.gcm.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
     <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -45,7 +46,7 @@
         </activity>
 
         <!-- Declaring broadcast receiver for BOOT_COMPLETED event. -->
-        <receiver android:name=".EMHTReceiver" android:enabled="true" android:exported="false">
+        <receiver android:name=".sync.BootReceiver" android:enabled="true" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
