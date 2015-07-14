@@ -1,5 +1,6 @@
 package sintef.android.emht;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
@@ -21,6 +22,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -161,6 +163,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startService(new Intent(this, RegistrationIntentService.class));
     }
 
+    public void logout(View view) {
+        // remove account and restart app
+        Account account = AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE)[0];
+        final AccountManagerFuture<Bundle> future = AccountManager.get(this).removeAccount(account, this, new AccountManagerCallback<Bundle>() {
+            @Override
+            public void run(AccountManagerFuture<Bundle> future) {
+                try {
+                    future.getResult();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    Intent intent = getBaseContext().getPackageManager()
+                            .getLaunchIntentForPackage(getBaseContext().getPackageName());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    finish();
+                    startActivity(intent);
+                }
+            }
+        }, null);
+    }
+
     private static int getMapPadding(Context context)
     {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -172,7 +195,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         int smallest = (width < height) ? width : height;
 
-        return smallest/6; // a sort-of-qualified guess
+        return smallest/6; // a sort-of-educated guess
     }
 
 
