@@ -204,6 +204,8 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
         if (this.type.contains("phone")) return R.string.phone_alarm;
         if (this.type.contains("police")) return R.string.police_alarm;
         if (this.type.contains("fire")) return R.string.fire_alarm;
+        if (this.type.contains("elder")) return R.string.elder_alarm;
+        if (this.type.contains("fall")) return R.string.fall_alarm;
         return R.string.undefined_alarm;
     }
 
@@ -213,6 +215,8 @@ public class Alarm extends SugarRecord<Alarm> implements Serializable {
         if (this.type.contains("phone")) return R.mipmap.ic_phone_alarm;
         if (this.type.contains("police")) return R.mipmap.ic_police_alarm;
         if (this.type.contains("fire")) return R.mipmap.ic_fire_alarm;
+        if (this.type.contains("elder")) return R.mipmap.ic_elder_alarm;
+        if (this.type.contains("fall")) return R.mipmap.ic_fall_alarm;
         return R.mipmap.ic_launcher;
     }
 
