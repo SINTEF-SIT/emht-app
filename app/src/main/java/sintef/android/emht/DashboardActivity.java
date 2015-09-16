@@ -128,6 +128,7 @@ public class DashboardActivity extends FragmentActivity implements View.OnTouchL
             binder.setListener(new BoundServiceListener() {
                 @Override
                 public void showGooglePlayServicesErrorDialog(int errorCode) {
+                    Log.w(TAG, "error with play services");
                     buildGooglePlayServicesErrorDialog(errorCode);
                 }
 

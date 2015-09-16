@@ -4,8 +4,6 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -29,7 +27,10 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
+import sintef.android.emht.account.BoundServiceListener;
 import sintef.android.emht.events.NewAlarmEvent;
 import sintef.android.emht.events.SyncEvent;
 import sintef.android.emht.models.Alarm;
@@ -74,16 +76,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int padding;
     private float maxZoom = 17.0f; // to avoid breaching openstreetmaps tile usage policy
     private TileOverlayOptions tileOverlayOptions;
+    private MapFragment mapFragment;
+    private boolean accountSet = false;
 
     private ServiceConnection mConnection = new ServiceConnection() {
+
 
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
+            Log.w(TAG, "service connected");
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             ServerSync.LocalBinder binder = (ServerSync.LocalBinder) service;
             mServerSync = binder.getService();
             mBound = true;
+            binder.setListener(new BoundServiceListener() {
+                @Override
+                public void showGooglePlayServicesErrorDialog(int errorCode) {
+                    Log.w(TAG, "error with play services");
+                    buildGooglePlayServicesErrorDialog(errorCode);
+                }
+
+                @Override
+                public void showAlarmTransmitComplete() {
+                    // show toast with message?
+                }
+
+                @Override
+                public void updateSensors() {
+                    //assessmentFragment.updateSensors();
+                }
+            });
         }
 
         @Override
@@ -92,35 +115,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
+    private void buildGooglePlayServicesErrorDialog(int errorCode) {
+        if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
+            Log.w(TAG, "is recoverable");
+            GooglePlayServicesUtil.getErrorDialog(errorCode, this, 9000, new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    MapsActivity.this.finish();
+                }
+            }).show();
+        } else {
+            Toast.makeText(this, R.string.device_incompatible, Toast.LENGTH_SHORT);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
 
-        if (AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE).length == 0) {
-            addNewAccount();
-        } else {
-            startGcmRegistration();
-            EventBus.getDefault().post(new SyncEvent());
-        }
-
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.map);
-        // add our cached tile provider to map
-        mapFragment.getMap().setMapType(GoogleMap.MAP_TYPE_NONE);
-        tileOverlayOptions = new CachingUrlTileProvider(this, 256, 256) {
-            @Override
-            public String getTileUrl(int x, int y, int z) {
-                if (z > maxZoom) return null;
-                return String.format("https://a.tile.openstreetmap.org/%3$s/%1$s/%2$s.png",x,y,z);
-            }
-        }.createTileOverlayOptions();
-        mapFragment.getMapAsync(this);
-        markerMap = new HashMap<>();
         EventBus.getDefault().register(this);
         Intent intent = new Intent(this, ServerSync.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        padding = getMapPadding(this);
+
+        setContentView(R.layout.activity_maps);
+
     }
 
     @Override
@@ -136,16 +154,51 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
-        firstAlarmSet = false;
-        updateMarkers();
-        if (googleMap != null) {
-            googleMap.clear();
-            googleMap.addTileOverlay(tileOverlayOptions);
+
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS) {
+            buildGooglePlayServicesErrorDialog(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this));
+        } else {
+            if (!accountSet) setAccount();
+            if (mapFragment == null) {
+                mapFragment = (MapFragment) getFragmentManager()
+                        .findFragmentById(R.id.map);
+                // add our cached tile provider to map
+                mapFragment.getMap().setMapType(GoogleMap.MAP_TYPE_NONE);
+                tileOverlayOptions = new CachingUrlTileProvider(this, 256, 256) {
+                    @Override
+                    public String getTileUrl(int x, int y, int z) {
+                        // return null if zoom is too high (in compliance with openstreetmap rules)
+                        if (z > maxZoom) return null;
+                        return String.format("https://a.tile.openstreetmap.org/%3$s/%1$s/%2$s.png", x, y, z);
+                    }
+                }.createTileOverlayOptions();
+                mapFragment.getMapAsync(this);
+                markerMap = new HashMap<>();
+                padding = getMapPadding(this);
+
+            }
+            firstAlarmSet = false;
+            updateMarkers();
+            if (googleMap != null) {
+                googleMap.clear();
+                googleMap.addTileOverlay(tileOverlayOptions);
+            }
+            // Remove notifications from notification panel
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(Constants.GCM_NEW_ALARM_NOTIFICATION_ID);
         }
-        // Remove notifications from notification panel
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(Constants.GCM_NEW_ALARM_NOTIFICATION_ID);
+
+    }
+
+    private void setAccount() {
+        if (AccountManager.get(this).getAccountsByType(Constants.ACCOUNT_TYPE).length == 0) {
+            addNewAccount();
+        } else {
+            startGcmRegistration();
+            EventBus.getDefault().post(new SyncEvent());
+        }
+        accountSet = true;
     }
 
     private void addNewAccount() {

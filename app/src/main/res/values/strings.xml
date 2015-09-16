@@ -4,6 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="account_label">EMHT</string>
+    <string name="device_incompatible">Device is incompatible</string>
 
     <!-- account preferences -->
     <string name="account_pref_category">EMHT Preferences</string>
