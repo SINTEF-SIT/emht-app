@@ -44,8 +44,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.ui.IconGenerator;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -302,6 +305,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         this.googleMap = googleMap;
+
+        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+
+                View view = getLayoutInflater().inflate(R.layout.alarm_info_window, null);
+                TextView title = (TextView) view.findViewById(R.id.info_window_title);
+                TextView description = (TextView) view.findViewById(R.id.info_window_description);
+                TextView dispatchTimeDelta = (TextView) view.findViewById(R.id.info_window_dispatch_time_delta);
+
+                title.setText(marker.getTitle());
+                String[] snippets = marker.getSnippet().split(";");
+                Log.w(TAG, snippets[0]);
+                Log.w(TAG, snippets[1]);
+                description.setText(snippets[0]);
+                dispatchTimeDelta.setText(snippets[1]);
+
+                return view;
+            }
+        });
+
         googleMap.addTileOverlay(tileOverlayOptions);
         Log.w(TAG, "map ready");
         googleMap.setMyLocationEnabled(true);
@@ -376,6 +405,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     String snippet = "Alarm type: " + getResources().getString(alarm.getTypeInNaturalLanguage()) + ".";
                     if (queueNumber == 1) snippet += " Tap to select.";
+
+                    Long dispatchTimeDelta = new Date().getTime() - alarm.getDispatchingTime().getTime();
+                    Long dispatchTimeDeltaMinutes = dispatchTimeDelta / (60 * 1000) % 60;
+                    Long dispatchTimeDeltaHours = dispatchTimeDeltaMinutes / 60;
+                    String timeSinceDispatch = "";
+                    if (dispatchTimeDeltaHours > 0) timeSinceDispatch += dispatchTimeDelta + "h ";
+                    timeSinceDispatch += dispatchTimeDeltaMinutes + "m";
+                    snippet += ";" + "Time since dispatch: " + timeSinceDispatch;
 
                     MarkerOptions marker = new MarkerOptions()
                             .title(alarm.getOccuranceAddress())
