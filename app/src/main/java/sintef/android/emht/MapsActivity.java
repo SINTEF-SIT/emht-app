@@ -412,6 +412,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     String timeSinceDispatch = "";
                     if (dispatchTimeDeltaHours > 0) timeSinceDispatch += dispatchTimeDelta + "h ";
                     timeSinceDispatch += dispatchTimeDeltaMinutes + "m";
+                    // ; is a marker for splitting the string in the InfoWindowAdapter
                     snippet += ";" + "Time since dispatch: " + timeSinceDispatch;
 
                     MarkerOptions marker = new MarkerOptions()
